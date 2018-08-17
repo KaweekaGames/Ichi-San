@@ -16,9 +16,6 @@ public class Card : MonoBehaviour
     // holder for location to go back to if move is invalid
     Vector3 oldLocation;
 
-    // reference to player object
-    public Player myPlayer;
-
     // sprites for cards
     [SerializeField]
     Sprite[] spadeSprites;
@@ -35,14 +32,6 @@ public class Card : MonoBehaviour
     {
         AssingedValue = value;
 
-        if(AssingedValue == 0)
-        {
-            MySpriteRenderer.sprite = spadeSprites[0];
-            MySpriteRenderer.enabled = false;
-
-            return;
-        }
-
         int suit = AssingedValue / 100;
 
         int type = AssingedValue % 100;
@@ -51,27 +40,22 @@ public class Card : MonoBehaviour
         {
             case 1:
                 MySpriteRenderer.sprite = spadeSprites[type];
-                MySpriteRenderer.enabled = true;
                 break;
 
             case 2:
                 MySpriteRenderer.sprite = clubSprites[type];
-                MySpriteRenderer.enabled = true;
                 break;
 
             case 3:
                 MySpriteRenderer.sprite = diamondSprites[type];
-                MySpriteRenderer.enabled = true;
                 break;
 
             case 4:
                 MySpriteRenderer.sprite = heartSprites[type];
-                MySpriteRenderer.enabled = true;
                 break;
 
             default:
                 MySpriteRenderer.sprite = spadeSprites[0];
-                MySpriteRenderer.enabled = false;
                 break;
         }
     }

@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class CardHolder : MonoBehaviour
 {
-
     public Vector3 Location;
 
     public string SortingLayer;

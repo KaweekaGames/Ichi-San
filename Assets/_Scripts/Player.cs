@@ -80,6 +80,8 @@ public class Player : NetworkBehaviour
         if(localGM == null)
         {
             localGM = FindObjectOfType<GameManager>();
+
+            localGM.AddLocalPlayer(this);
         }
 
         if (cardLocations == null)
@@ -95,6 +97,7 @@ public class Player : NetworkBehaviour
         }
     }
 
+    // Called by Server to add card to hand
     [ClientRpc]
     public void RpcAddCard(int newCard)
     {
@@ -103,31 +106,32 @@ public class Player : NetworkBehaviour
             return;
         }
 
-        cardPlacementLoc = new Vector3();
-
-        bool locationFound = false;
-
-        for (int i = 0; !locationFound; i++)
+        if (MyInt == localGM.playerTurn)
         {
-            if (!cardLocations[i].Occupied)
+            cardPlacementLoc = new Vector3();
+
+            bool locationFound = false;
+
+            for (int i = 0; !locationFound; i++)
             {
-                cardPlacementLoc = cardLocations[i].Location;
+                if (!cardLocations[i].Occupied)
+                {
+                    cardPlacementLoc = cardLocations[i].Location;
 
-                locationFound = true;
+                    locationFound = true;
+                }
             }
+
+            GameObject nCard = GameObject.Instantiate(cardPrefab, cardPlacementLoc, Quaternion.identity);
+
+            Card card = nCard.GetComponent<Card>();
+
+            card.SetValue(newCard);
+
+            card.SetPosition(cardPlacementLoc);
+
+            myHand.Add(card.AssingedValue); 
         }
-
-        GameObject nCard = GameObject.Instantiate(cardPrefab, cardPlacementLoc, Quaternion.identity);
-
-        Card card = nCard.GetComponent<Card>();
-
-        card.SetValue(newCard);
-
-        card.SetPosition(cardPlacementLoc);
-
-        card.myPlayer = this;
-
-        myHand.Add(card.AssingedValue);
     }
 
     [ClientRpc]
