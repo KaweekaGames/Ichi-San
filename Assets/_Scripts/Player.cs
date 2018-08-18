@@ -37,12 +37,18 @@ public class Player : NetworkBehaviour
     GameManager localGM;
 
     // number given by GM to determin play order
+    [SyncVar]
     public int MyInt;
+
+    // player name
+    [SyncVar]
+    public string myName = "nobody";
 
     bool recievedMyInt = false;
 
     Vector3 cardPlacementLoc;
 
+    NetworkIdentity myNetId;
 
     // Build hand area
     void LayoutHandArea()
@@ -77,11 +83,29 @@ public class Player : NetworkBehaviour
             return;
         }
 
+        if(myHand == null)
+        {
+            myHand = new List<int>();
+        }
+
         if(localGM == null)
         {
             localGM = FindObjectOfType<GameManager>();
 
-            localGM.AddLocalPlayer(this);
+            if (localGM == null)
+            {
+                return;
+            }
+
+        }
+
+        if (!recievedMyInt && localGM != null)
+        {
+            gameObject.name = myName;
+
+            myNetId = gameObject.GetComponent<NetworkIdentity>();
+
+            AddMyPlayer(myNetId);
         }
 
         if (cardLocations == null)
@@ -90,11 +114,11 @@ public class Player : NetworkBehaviour
 
             LayoutHandArea();
         }
+    }
 
-        if(myHand == null)
-        {
-            myHand = new List<int>();
-        }
+    void AddMyPlayer(NetworkIdentity netId)
+    {
+        localGM.AddPlayer(netId);
     }
 
     // Called by Server to add card to hand
@@ -106,32 +130,31 @@ public class Player : NetworkBehaviour
             return;
         }
 
-        if (MyInt == localGM.playerTurn)
+        cardPlacementLoc = new Vector3();
+
+        bool locationFound = false;
+
+        for (int i = 0; !locationFound; i++)
         {
-            cardPlacementLoc = new Vector3();
-
-            bool locationFound = false;
-
-            for (int i = 0; !locationFound; i++)
+            if (!cardLocations[i].Occupied)
             {
-                if (!cardLocations[i].Occupied)
-                {
-                    cardPlacementLoc = cardLocations[i].Location;
+                cardPlacementLoc = cardLocations[i].Location;
 
-                    locationFound = true;
-                }
+                locationFound = true;
+
+                cardLocations[i].Occupied = true;
             }
-
-            GameObject nCard = GameObject.Instantiate(cardPrefab, cardPlacementLoc, Quaternion.identity);
-
-            Card card = nCard.GetComponent<Card>();
-
-            card.SetValue(newCard);
-
-            card.SetPosition(cardPlacementLoc);
-
-            myHand.Add(card.AssingedValue); 
         }
+
+        GameObject nCard = GameObject.Instantiate(cardPrefab, cardPlacementLoc, Quaternion.identity);
+
+        Card card = nCard.GetComponent<Card>();
+
+        card.SetValue(newCard);
+
+        card.SetPosition(cardPlacementLoc);
+
+        myHand.Add(card.AssingedValue);
     }
 
     [ClientRpc]

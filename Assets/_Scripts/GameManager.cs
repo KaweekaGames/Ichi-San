@@ -44,6 +44,41 @@ public class GameManager : NetworkBehaviour
 
     List<int>[] playerHands;
 
+    bool handDealt = false;
+
+    private void Start()
+    {
+        if (player0Hand == null)
+        {
+            player0Hand = new List<int>();
+        }
+
+        if (player1Hand == null)
+        {
+            player1Hand = new List<int>();
+        }
+
+        if (player2Hand == null)
+        {
+            player2Hand = new List<int>();
+        }
+
+        if (player3Hand == null)
+        {
+            player3Hand = new List<int>();
+        }
+
+        if (playerList == null)
+        {
+            playerList = new List<Player>();
+        }
+
+        if (discardPile == null)
+        {
+            discardPile = new List<int>();
+        }
+    }
+
     void Update()
     {
         if (!isServer)
@@ -56,17 +91,45 @@ public class GameManager : NetworkBehaviour
         {
             RefreshDrawPile();
         }
+
+        //Temp
+        if (playerList != null && playerList.Count >0 && !handDealt)
+        {
+            DealCards(standardDeck);
+        }
     }
 
-    // Add local player
-    public void AddLocalPlayer(Player localPlayer)
+    //// Add local player
+    //public void AddLocalPlayer(Player localPlayer)
+    //{
+    //    MyLocalPlayer = localPlayer;
+    //}
+
+    // Add player to list of players and assign their turn number (MyInt)
+    public void AddPlayer(NetworkIdentity id)
     {
-        if (!isLocalPlayer)
+        if (!isServer)
         {
             return;
         }
 
-        MyLocalPlayer = localPlayer;
+        Player newPlayer = id.gameObject.GetComponent<Player>();
+
+        int nextPlayerNumber = playerList.Count;
+
+        playerList.Add(newPlayer);
+
+        newPlayer.RpcGetNumber(nextPlayerNumber);
+
+        playerCount = playerList.Count;
+
+        string newName = newPlayer.name;
+
+        playerNames.Add(newName);
+
+        int playerNamesLength = playerNames.Count;
+
+        //lastPlayerAdded = playerNames[playerNamesLength - 1];
     }
 
 
@@ -81,8 +144,6 @@ public class GameManager : NetworkBehaviour
 
         List<int> shuffledDeck = new List<int>();
 
-        Random ran = new Random();
-
         tmpDeck = cardDeck;
 
         for (int i = 0; i < 2; i++)
@@ -91,9 +152,7 @@ public class GameManager : NetworkBehaviour
 
             while (tmpDeck.Count > 0)
             {
-                //int rNum = Random.Range(0, tmpDeck.Count);
-
-                int rNum = ran.Next(0, tmpDeck.Count - 1);
+                int rNum = Random.Range(0, tmpDeck.Count);
 
                 shuffledDeck.Add(tmpDeck[rNum]);
 
@@ -123,13 +182,11 @@ public class GameManager : NetworkBehaviour
     // Function deals cards to players to start round
     private void DealCards(List<int> cardDeck)
     {
-        int originalTurn = playerTurn;
-        
         // Generate draw pile from a fresh deck
         drawPile = ShuffleDeck(cardDeck);
 
         // Deal 7 cards to each player
-        for (int i = 0; i < 7; i++)
+        for (int i = 0; i < 22; i++)
         {
             // Switch from player to player after each card dealt from deck
             for (int j = 0; j < playerCount; j++)
@@ -141,9 +198,7 @@ public class GameManager : NetworkBehaviour
                 drawPile.RemoveAt(rNum);
 
                 // set player turn so only that player can recive this card
-                playerTurn = j;
-
-                MyLocalPlayer.RpcAddCard(card);
+                playerList[j].RpcAddCard(card);
 
                 // Add cards to reference to each players hand
                 switch (playerTurn)
@@ -170,13 +225,13 @@ public class GameManager : NetworkBehaviour
             }
         }
 
-        DiscardPileCard = drawPile(drawPile.Count - 1);
+        DiscardPileCard = drawPile[drawPile.Count - 1];
 
         discardPile.Add(DiscardPileCard);
 
-        drawPile.RemoveAt[drawPile.Count - 1];
+        drawPile.RemoveAt(drawPile.Count - 1);
 
-        playerTurn = originalTurn;
+        handDealt = true;
     }
 
 
@@ -224,7 +279,7 @@ public class GameManager : NetworkBehaviour
 
         int discardPileCardSuit = DiscardPileCard / 100;
 
-        if(cardSuit == discardCardSuit)
+        if(cardSuit == discardPileCardSuit)
         {
             matchedSuit = true;
         }
@@ -241,7 +296,7 @@ public class GameManager : NetworkBehaviour
 
         int discardPileCardRank = DiscardPileCard % 100;
 
-        if (cardRank == discardCardRank)
+        if (cardRank == discardPileCardRank)
         {
             matchedRank = true;
         }

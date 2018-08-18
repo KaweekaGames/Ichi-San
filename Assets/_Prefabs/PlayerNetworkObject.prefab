@@ -87,8 +87,10 @@ MonoBehaviour:
   startingPoint: {x: -2, y: -1, z: 0}
   xInterval: 0.44
   yInterval: -0.5
-  numColumns: 7
-  numRows: 2
+  numColumns: 10
+  numRows: 4
   cardPrefab: {fileID: 1485943206030364, guid: a8fded08c73ed5c4b9a14425d0ae0e66, type: 2}
   cardHolderPrefab: {fileID: 1298626017570132, guid: 043034eaae7f08041a8751225d9115f2,
     type: 2}
+  MyInt: 5
+  myName: nobody
