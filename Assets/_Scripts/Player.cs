@@ -33,22 +33,20 @@ public class Player : NetworkBehaviour
     // current hand
     List<int> myHand;
 
-    // reference to local GameManager
-    GameManager localGM;
+    // reference to GameManager
+    GameManager myGM;
 
     // number given by GM to determin play order
     [SyncVar]
     public int MyInt;
 
     // player name
-    [SyncVar]
+    [SyncVar(hook = "GetMyName")]
     public string myName = "nobody";
 
     bool recievedMyInt = false;
 
     Vector3 cardPlacementLoc;
-
-    NetworkIdentity myNetId;
 
     // Build hand area
     void LayoutHandArea()
@@ -73,13 +71,35 @@ public class Player : NetworkBehaviour
             }
         }
     }
-    
-    
+
+    private void Start()
+    {
+        GetMyName(myName);
+
+        if (isLocalPlayer)
+        {
+            cardLocations = new List<CardHolder>();
+
+            LayoutHandArea(); 
+        }
+    }
+
     // Update is called once per frame
     void Update()
     {
         if (!isLocalPlayer)
         {
+            if (myGM == null)
+            {
+                myGM = FindObjectOfType<GameManager>();
+
+                if (myGM == null)
+                {
+                    return;
+                }
+
+            }
+
             return;
         }
 
@@ -88,40 +108,32 @@ public class Player : NetworkBehaviour
             myHand = new List<int>();
         }
 
-        if(localGM == null)
+        if (myGM == null)
         {
-            localGM = FindObjectOfType<GameManager>();
+            myGM = FindObjectOfType<GameManager>();
 
-            if (localGM == null)
+            if (myGM == null)
             {
                 return;
             }
 
         }
-
-        if (!recievedMyInt && localGM != null)
-        {
-            gameObject.name = myName;
-
-            myNetId = gameObject.GetComponent<NetworkIdentity>();
-
-            AddMyPlayer(myNetId);
-        }
-
-        if (cardLocations == null)
-        {
-            cardLocations = new List<CardHolder>();
-
-            LayoutHandArea();
-        }
-    }
-
-    void AddMyPlayer(NetworkIdentity netId)
-    {
-        localGM.AddPlayer(netId);
     }
 
     // Called by Server to add card to hand
+    public void AddCard(int newCard)
+    {
+        if (isServer)
+        {
+            RpcAddCard(newCard);
+        }
+        else
+        {
+            CmdAddCard(newCard);
+        }
+
+    }
+
     [ClientRpc]
     public void RpcAddCard(int newCard)
     {
@@ -146,7 +158,7 @@ public class Player : NetworkBehaviour
             }
         }
 
-        GameObject nCard = GameObject.Instantiate(cardPrefab, cardPlacementLoc, Quaternion.identity);
+        GameObject nCard = Instantiate(cardPrefab, cardPlacementLoc, Quaternion.identity);
 
         Card card = nCard.GetComponent<Card>();
 
@@ -157,13 +169,48 @@ public class Player : NetworkBehaviour
         myHand.Add(card.AssingedValue);
     }
 
+    [Command]
+    public void CmdAddCard(int newCard)
+    {
+        RpcAddCard(newCard);
+    }
+
     [ClientRpc]
     public void RpcGetNumber(int number)
     {
         MyInt = number;
 
         recievedMyInt = true;
+    }
 
-        localGM.MyLocalPlayer = this;
+    [ClientRpc]
+    public void RpcCheckMyCard(int cardValue)
+    {
+        bool validCard = myGM.CheckCard(cardValue);
+
+        Debug.Log("this card's validity is " + validCard);
+    }
+
+    [Command]
+    public void CmdCheckMyCard(int cardValue)
+    {
+        RpcCheckMyCard(cardValue);
+    }
+
+    public void GetMyName(string myName)
+    {
+        gameObject.name = myName;
+    }
+
+    public void Test(int num)
+    {
+        if (isServer)
+        {
+            RpcCheckMyCard(num);
+        }
+        else
+        {
+            CmdCheckMyCard(num);
+        }
     }
 }
