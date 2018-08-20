@@ -40,13 +40,21 @@ public class Player : NetworkBehaviour
     [SyncVar]
     public int MyInt;
 
-    // player name
+    // player name set at Lobby scene
     [SyncVar(hook = "GetMyName")]
     public string myName = "nobody";
+
+    // reference to checked card
+    public Card checkedCard;
 
     bool recievedMyInt = false;
 
     Vector3 cardPlacementLoc;
+
+
+    //*****
+    // Functions
+    //*****
 
     // Build hand area
     void LayoutHandArea()
@@ -82,6 +90,8 @@ public class Player : NetworkBehaviour
 
             LayoutHandArea(); 
         }
+
+        myHand = new List<int>();
     }
 
     // Update is called once per frame
@@ -97,15 +107,9 @@ public class Player : NetworkBehaviour
                 {
                     return;
                 }
-
             }
 
             return;
-        }
-
-        if(myHand == null)
-        {
-            myHand = new List<int>();
         }
 
         if (myGM == null)
@@ -116,7 +120,6 @@ public class Player : NetworkBehaviour
             {
                 return;
             }
-
         }
     }
 
@@ -166,6 +169,8 @@ public class Player : NetworkBehaviour
 
         card.SetPosition(cardPlacementLoc);
 
+        card.MyPlayer = this;
+
         myHand.Add(card.AssingedValue);
     }
 
@@ -202,7 +207,8 @@ public class Player : NetworkBehaviour
         gameObject.name = myName;
     }
 
-    public void Test(int num)
+    // Check if valid play
+    public void CheckMyCard(int num)
     {
         if (isServer)
         {
@@ -212,5 +218,13 @@ public class Player : NetworkBehaviour
         {
             CmdCheckMyCard(num);
         }
+    }
+
+    // Check if it is my turn
+    public bool TurnCheck()
+    {
+        bool itIsMyTurn = (MyInt == myGM.playerTurn);
+
+        return itIsMyTurn;
     }
 }

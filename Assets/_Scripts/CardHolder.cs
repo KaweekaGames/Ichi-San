@@ -11,16 +11,4 @@ public class CardHolder : MonoBehaviour
     public int OrderInLayer;
 
     public bool Occupied = false;
-    
-    // Use this for initialization
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
 }

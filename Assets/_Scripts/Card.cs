@@ -7,9 +7,12 @@ public class Card : MonoBehaviour
     // set to disabled when not active
     public SpriteRenderer MySpriteRenderer;
 
-    // value given by GameManager to player
+    // card value given by GameManager to player
     public int AssingedValue = 0;
 
+    // local player
+    public Player MyPlayer;
+    
     // placement on board
     Vector3 CurrentLocation;
 
@@ -64,5 +67,40 @@ public class Card : MonoBehaviour
     public void SetPosition(Vector3 newLocation)
     {
         transform.position = newLocation;
+
+        CurrentLocation = transform.position;
+    }
+
+    // called to move card
+    public void MoveLocation(Vector3 newLocation)
+    {
+        //Itween move to location
+    }
+
+    void OnCollisionEnter2D (Collider2D col)
+    {
+        if (col.tag == "DiscardPile")
+        {
+            if (MyPlayer.TurnCheck())
+            {
+                MyPlayer.CheckMyCard(AssingedValue);
+
+                MyPlayer.CheckedCard = this;
+            }
+            else
+            {
+                MoveLocation(CurrentLocation);
+            } 
+        }
+        else if (col.tag == "Card")
+        {
+            oldLocation = CurrentLocation;
+
+            CurrentLocation = col.tranform.position;
+
+            Card hitCard = col.GetComponent<Card>();
+
+            hitCard.MoveLocation(oldLocation);
+        }
     }
 }
