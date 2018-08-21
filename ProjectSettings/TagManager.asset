@@ -41,18 +41,9 @@ TagManager:
   - 
   - 
   m_SortingLayers:
-  - name: first
-    uniqueID: 2638823411
-    locked: 0
-  - name: second
-    uniqueID: 1831014727
-    locked: 0
-  - name: third
-    uniqueID: 79018205
-    locked: 0
-  - name: fourth
-    uniqueID: 1650195387
-    locked: 0
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: CardSortingLayer
+    uniqueID: 2638823411
     locked: 0

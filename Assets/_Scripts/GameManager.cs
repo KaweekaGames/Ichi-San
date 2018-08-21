@@ -52,9 +52,9 @@ public class GameManager : NetworkBehaviour
 
     private void Start()
     {
-        NetworkLobbyManager lobbyManager = FindObjectOfType<NetworkLobbyManager>();
+        //NetworkLobbyManager lobbyManager = FindObjectOfType<NetworkLobbyManager>();
 
-        ExpectedPlayerCount = lobbyManager.numPlayers;
+        //ExpectedPlayerCount = lobbyManager.numPlayers;
 
         if (player0Hand == null)
         {
@@ -101,7 +101,7 @@ public class GameManager : NetworkBehaviour
             RefreshDrawPile();
         }
 
-        if(playerList.Count < ExpectedPlayerCount)
+        if(playerList.Count < 1)//ExpectedPlayerCount
         {
             GameObject [] newPlayers = GameObject.FindGameObjectsWithTag("Player");
 
@@ -111,8 +111,6 @@ public class GameManager : NetworkBehaviour
 
                 if (!playerList.Contains(newPlayerScript))
                 {
-                    Debug.Log("I found me one");
-
                     AddPlayer(gO);
                 } 
             }
@@ -352,5 +350,11 @@ public class GameManager : NetworkBehaviour
             //TODO skip turn state
         }
         else return;
+    }
+
+    //temp
+    public void ChangePlayerTurn()
+    {
+        playerTurn = 1;
     }
 }

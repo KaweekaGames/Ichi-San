@@ -25,7 +25,7 @@ public class Player : NetworkBehaviour
 
     // field to properly display cards
     [SerializeField]
-    enum SortingLayer { first, second, third, fourth}
+    string sortingLayer = "CardSortingLayer";
 
     // list of all possible places to put your cards
     List<CardHolder> cardLocations;
@@ -45,7 +45,10 @@ public class Player : NetworkBehaviour
     public string myName = "nobody";
 
     // reference to checked card
-    public Card checkedCard;
+    public Card CheckedCard;
+
+    // reference to cardHolder
+    CardHolder cardHolderRef;
 
     bool recievedMyInt = false;
 
@@ -71,7 +74,7 @@ public class Player : NetworkBehaviour
 
                 cardHolder.Location = location;
 
-                cardHolder.SortingLayer = ((SortingLayer)i).ToString("d");
+                cardHolder.SortingLayer = sortingLayer;
 
                 cardHolder.OrderInLayer = j;
 
@@ -153,11 +156,13 @@ public class Player : NetworkBehaviour
         {
             if (!cardLocations[i].Occupied)
             {
-                cardPlacementLoc = cardLocations[i].Location;
+                cardHolderRef = cardLocations[i];
+
+                cardPlacementLoc = cardHolderRef.Location;
 
                 locationFound = true;
 
-                cardLocations[i].Occupied = true;
+                cardHolderRef.Occupied = true;
             }
         }
 
@@ -170,6 +175,9 @@ public class Player : NetworkBehaviour
         card.SetPosition(cardPlacementLoc);
 
         card.MyPlayer = this;
+
+        card.MySpriteRenderer.sortingLayerName = cardHolderRef.SortingLayer;
+        card.MySpriteRenderer.sortingOrder = cardHolderRef.OrderInLayer;
 
         myHand.Add(card.AssingedValue);
     }
