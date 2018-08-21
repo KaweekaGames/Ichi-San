@@ -25,7 +25,7 @@ GameObject:
   - component: {fileID: 50378073453559894}
   m_Layer: 0
   m_Name: Card
-  m_TagString: Untagged
+  m_TagString: Card
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -105,6 +105,8 @@ MonoBehaviour:
   constantMoveTime: 0.2
   delay: 0.1
   scaleTime: 0.1
+  shiftTime: 0.1
+  shiftedZPosition: -1.6
   moveEase: 0
   scaleFactor: {x: 1.2, y: 1.2, z: 1}
   onDiscardPile: 0

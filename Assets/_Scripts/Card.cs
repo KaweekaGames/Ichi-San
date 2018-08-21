@@ -26,6 +26,8 @@ public class Card : MonoBehaviour
     public float constantMoveTime = .1f;
     public float delay = .3f;
     public float scaleTime = .1f;
+    public float shiftTime = .1f;
+    public float shiftedZPosition = -1.6f;
     public EaseType moveEase;
     public Vector3 scaleFactor;
     public bool onDiscardPile = false;
@@ -96,11 +98,24 @@ public class Card : MonoBehaviour
     }
 
     // called to move card
-    public void MoveLocation(Vector3 newLocation)
+    public void ReturnToHand(Vector3 newLocation)
     {
         gameObject.ScaleTo(originalScale, scaleTime, 0f);
         gameObject.MoveTo(newLocation, constantMoveTime, delay, moveEase);
         MySpriteRenderer.sortingOrder = mySortingOrder;
+    }
+
+    public int ShiftPosition(Card bullyCard)
+    {
+        int oldSortingOrder = mySortingOrder;
+
+        CurrentLocation = bullyCard.oldLocation;
+        gameObject.MoveUpdate(CurrentLocation, shiftTime);
+        mySortingOrder = bullyCard.mySortingOrder;
+        MySpriteRenderer.sortingOrder = mySortingOrder;
+
+        return oldSortingOrder;
+
     }
 
     void OnTriggerEnter2D(Collider2D col)
@@ -112,32 +127,29 @@ public class Card : MonoBehaviour
 
         if (col.transform.tag == "DiscardPile")
         {
-            Debug.Log("hit Pile");
 
             if (MyPlayer.TurnCheck())
             {
-                Debug.Log("its true");
                 MyPlayer.CheckMyCard(AssingedValue);
 
                 MyPlayer.CheckedCard = this;
             }
             else
             {
-                Debug.Log("its false");
                 touched = false;
-                MoveLocation(CurrentLocation);
+                ReturnToHand(CurrentLocation);
             }
         }
-        //else if (col.transform.tag == "Card")
-        //{
-        //    oldLocation = CurrentLocation;
+        else if (col.transform.tag == "Card" && touched)
+        {
+            oldLocation = CurrentLocation;
 
-        //    CurrentLocation = col.transform.position;
+            CurrentLocation = col.transform.position;
 
-        //    Card hitCard = col.transform.GetComponent<Card>();
+            Card hitCard = col.transform.GetComponent<Card>();
 
-        //    hitCard.MoveLocation(oldLocation);
-        //}
+            mySortingOrder = hitCard.ShiftPosition(this);
+        }
     }
 
     void OnTouchDown()
@@ -166,7 +178,7 @@ public class Card : MonoBehaviour
     {
         if (touched == true)
         {
-            targetPos = new Vector3(point.x, point.y, CurrentLocation.z); 
+            targetPos = new Vector3(point.x, point.y, shiftedZPosition); 
         }
     }
 

@@ -85,8 +85,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   startingPoint: {x: -7, y: -1.9, z: 0}
-  xInterval: 0.7
+  xInterval: 1.5
   yInterval: 0
+  zInterval: -0.05
   numColumns: 30
   numRows: 1
   cardPrefab: {fileID: 1485943206030364, guid: a8fded08c73ed5c4b9a14425d0ae0e66, type: 2}

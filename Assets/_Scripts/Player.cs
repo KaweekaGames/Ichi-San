@@ -13,6 +13,8 @@ public class Player : NetworkBehaviour
     [SerializeField]
     float yInterval;
     [SerializeField]
+    float zInterval;
+    [SerializeField]
     int numColumns;
     [SerializeField]
     int numRows;
@@ -66,7 +68,7 @@ public class Player : NetworkBehaviour
         {
             for (int j = 0; j < numColumns; j++)
             {
-                Vector3 location = new Vector3(startingPoint.x + j * xInterval, startingPoint.y + i * yInterval, startingPoint.z);
+                Vector3 location = new Vector3(startingPoint.x + j * xInterval, startingPoint.y + i * yInterval, startingPoint.z + j * zInterval);
 
                 GameObject newCardHolder = GameObject.Instantiate(cardHolderPrefab, location, Quaternion.identity);
 
