@@ -151,6 +151,8 @@ public class Player : NetworkBehaviour
 
         bool locationFound = false;
 
+
+
         for (int i = 0; !locationFound; i++)
         {
             if (!cardLocations[i].Occupied)

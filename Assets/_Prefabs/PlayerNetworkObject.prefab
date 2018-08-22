@@ -85,7 +85,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   startingPoint: {x: -7.3, y: -1.9, z: 0}
-  xInterval: 0.58
+  xInterval: 0.8
   yInterval: 0
   zInterval: -0.05
   numColumns: 30
