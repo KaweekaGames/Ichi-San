@@ -54,7 +54,6 @@ public class Player : NetworkBehaviour
 
     bool recievedMyInt = false;
 
-    Vector3 cardPlacementLoc;
 
 
     //*****
@@ -150,8 +149,6 @@ public class Player : NetworkBehaviour
             return;
         }
 
-        cardPlacementLoc = new Vector3();
-
         bool locationFound = false;
 
         for (int i = 0; !locationFound; i++)
@@ -160,23 +157,21 @@ public class Player : NetworkBehaviour
             {
                 cardHolderRef = cardLocations[i];
 
-                cardPlacementLoc = cardHolderRef.Location;
-
                 locationFound = true;
-
-                cardHolderRef.Occupied = true;
             }
         }
 
-        GameObject nCard = Instantiate(cardPrefab, cardPlacementLoc, Quaternion.identity);
+        GameObject nCard = Instantiate(cardPrefab, cardHolderRef.Location, Quaternion.identity);
 
         Card card = nCard.GetComponent<Card>();
 
         card.SetValue(newCard);
 
-        card.SetPosition(cardPlacementLoc);
+        card.SetPosition(cardHolderRef.Location);
+        cardHolderRef.Occupied = true;
 
         card.MyPlayer = this;
+        card.MyCardHolder = cardHolderRef;
 
         card.MySpriteRenderer.sortingLayerName = cardHolderRef.SortingLayer;
         card.MySpriteRenderer.sortingOrder = cardHolderRef.OrderInLayer;

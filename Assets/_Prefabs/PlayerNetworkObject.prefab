@@ -84,8 +84,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9fac40c6891dbba42ad2f8d0ffe4730a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startingPoint: {x: -7, y: -1.9, z: 0}
-  xInterval: 1.5
+  startingPoint: {x: -7.3, y: -1.9, z: 0}
+  xInterval: 0.58
   yInterval: 0
   zInterval: -0.05
   numColumns: 30

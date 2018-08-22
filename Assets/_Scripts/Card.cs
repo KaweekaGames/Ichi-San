@@ -13,25 +13,27 @@ public class Card : MonoBehaviour
     // local player
     public Player MyPlayer;
     
-    // placement on board
-    Vector3 CurrentLocation;
-
     // holder for location to go back to if move is invalid
     Vector3 oldLocation;
 
     // holder for sorting order
     int mySortingOrder;
 
+    // holder for Card Holder
+    public CardHolder MyCardHolder;
+
     // card movement variables
     public float constantMoveTime = .1f;
     public float delay = .3f;
+    public float shiftDelay = .2f;
     public float scaleTime = .1f;
     public float shiftTime = .1f;
     public float shiftedZPosition = -1.6f;
     public EaseType moveEase;
+    public EaseType snapEase;
     public Vector3 scaleFactor;
     public bool onDiscardPile = false;
-    bool touched;
+    public bool touched;
     Vector3 targetPos;
     Vector3 originalScale;
 
@@ -92,30 +94,36 @@ public class Card : MonoBehaviour
     {
         transform.position = newLocation;
 
-        CurrentLocation = transform.position;
-
         originalScale = transform.localScale;
     }
 
     // called to move card
-    public void ReturnToHand(Vector3 newLocation)
+    public void ReturnToHand()
     {
         gameObject.ScaleTo(originalScale, scaleTime, 0f);
-        gameObject.MoveTo(newLocation, constantMoveTime, delay, moveEase);
-        MySpriteRenderer.sortingOrder = mySortingOrder;
+        gameObject.MoveTo(MyCardHolder.Location, constantMoveTime, delay, moveEase);
+        MySpriteRenderer.sortingOrder = MyCardHolder.OrderInLayer;
     }
 
-    public int ShiftPosition(Card bullyCard)
+    public CardHolder ShiftPosition(CardHolder bullyCardHolder)
     {
-        int oldSortingOrder = mySortingOrder;
+        CardHolder oldCardHolder = MyCardHolder;
+        MyCardHolder = bullyCardHolder;
 
-        CurrentLocation = bullyCard.oldLocation;
-        gameObject.MoveUpdate(CurrentLocation, shiftTime);
-        mySortingOrder = bullyCard.mySortingOrder;
-        MySpriteRenderer.sortingOrder = mySortingOrder;
+        gameObject.MoveTo(MyCardHolder.Location, shiftTime, shiftDelay, snapEase);
+        MySpriteRenderer.sortingOrder = MyCardHolder.OrderInLayer;
 
-        return oldSortingOrder;
+        return oldCardHolder;
 
+    }
+
+    public void CallForShift(Collider2D col)
+    {
+        CardHolder bullyCardHolder = MyCardHolder;
+
+        CardMarker hitCardMarker = col.transform.GetComponent<CardMarker>();
+
+        MyCardHolder = hitCardMarker.ShiftPosition(bullyCardHolder);
     }
 
     void OnTriggerEnter2D(Collider2D col)
@@ -137,18 +145,8 @@ public class Card : MonoBehaviour
             else
             {
                 touched = false;
-                ReturnToHand(CurrentLocation);
+                ReturnToHand();
             }
-        }
-        else if (col.transform.tag == "Card" && touched)
-        {
-            oldLocation = CurrentLocation;
-
-            CurrentLocation = col.transform.position;
-
-            Card hitCard = col.transform.GetComponent<Card>();
-
-            mySortingOrder = hitCard.ShiftPosition(this);
         }
     }
 
@@ -157,7 +155,6 @@ public class Card : MonoBehaviour
         if (touched == false)
         {
             touched = true;
-            mySortingOrder = MySpriteRenderer.sortingOrder;
             gameObject.ScaleTo(scaleFactor, scaleTime, 0);
             MySpriteRenderer.sortingOrder = 60; 
         }
@@ -169,8 +166,8 @@ public class Card : MonoBehaviour
         {
             touched = false;
             gameObject.ScaleTo(originalScale, scaleTime, 0f);
-            gameObject.MoveTo(CurrentLocation, constantMoveTime, delay, moveEase);
-            MySpriteRenderer.sortingOrder = mySortingOrder; 
+            gameObject.MoveTo(MyCardHolder.Location, constantMoveTime, delay, moveEase);
+            MySpriteRenderer.sortingOrder = MyCardHolder.OrderInLayer; 
         }
     }
 
@@ -193,8 +190,8 @@ public class Card : MonoBehaviour
         {
             touched = false;
             gameObject.ScaleTo(originalScale, scaleTime, 0f);
-            MySpriteRenderer.sortingOrder = mySortingOrder;
-            gameObject.MoveTo(CurrentLocation, constantMoveTime, delay, moveEase); 
+            MySpriteRenderer.sortingOrder = MyCardHolder.OrderInLayer;
+            gameObject.MoveTo(MyCardHolder.Location, constantMoveTime, delay, moveEase); 
         }
     }
 }

@@ -11,6 +11,23 @@ Prefab:
   m_SourcePrefab: {fileID: 0}
   m_RootGameObject: {fileID: 1485943206030364}
   m_IsPrefabAsset: 1
+--- !u!1 &1002766292167772
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4243737194162620}
+  - component: {fileID: 61582385867173742}
+  - component: {fileID: 114316492572207898}
+  m_Layer: 0
+  m_Name: CardMarker
+  m_TagString: CardMarker
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &1485943206030364
 GameObject:
   m_ObjectHideFlags: 0
@@ -30,6 +47,19 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!4 &4243737194162620
+Transform:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1002766292167772}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4390691634347910}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4390691634347910
 Transform:
   m_ObjectHideFlags: 1
@@ -39,7 +69,8 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 4243737194162620}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -88,6 +119,31 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1.925874, y: 2.7938519}
   m_EdgeRadius: 0
+--- !u!61 &61582385867173742
+BoxCollider2D:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1002766292167772}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 0.1, y: 2}
+  m_EdgeRadius: 0
 --- !u!114 &114025836920031706
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -102,14 +158,18 @@ MonoBehaviour:
   MySpriteRenderer: {fileID: 212827062668441700}
   AssingedValue: 0
   MyPlayer: {fileID: 0}
+  MyCardHolder: {fileID: 0}
   constantMoveTime: 0.2
   delay: 0.1
+  shiftDelay: 0.2
   scaleTime: 0.1
-  shiftTime: 0.1
+  shiftTime: 0.15
   shiftedZPosition: -1.6
-  moveEase: 0
+  moveEase: 13
+  snapEase: 13
   scaleFactor: {x: 1.2, y: 1.2, z: 1}
   onDiscardPile: 0
+  touched: 0
   spadeSprites:
   - {fileID: 21300118, guid: e923c6082eef89646b87f3cce6960c60, type: 3}
   - {fileID: 21300000, guid: e923c6082eef89646b87f3cce6960c60, type: 3}
@@ -170,6 +230,18 @@ MonoBehaviour:
   - {fileID: 21300072, guid: e923c6082eef89646b87f3cce6960c60, type: 3}
   - {fileID: 21300074, guid: e923c6082eef89646b87f3cce6960c60, type: 3}
   - {fileID: 21300076, guid: e923c6082eef89646b87f3cce6960c60, type: 3}
+--- !u!114 &114316492572207898
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1002766292167772}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 693edfeae3fd6b7459c570ecbf731b64, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  myCard: {fileID: 114025836920031706}
 --- !u!212 &212827062668441700
 SpriteRenderer:
   m_ObjectHideFlags: 1

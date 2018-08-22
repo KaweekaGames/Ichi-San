@@ -209,7 +209,7 @@ public class GameManager : NetworkBehaviour
         drawPile = ShuffleDeck(cardDeck);
 
         // Deal 7 cards to each player
-        for (int i = 0; i < 7; i++)
+        for (int i = 0; i < 26; i++)
         {
             // Switch from player to player after each card dealt from deck
             for (int j = 0; j < playerCount; j++)
