@@ -97,7 +97,7 @@ public class Card : MonoBehaviour
         originalScale = transform.localScale;
     }
 
-    // called to move card
+    // called to move card back to player's hand
     public void ReturnToHand()
     {
         gameObject.ScaleTo(originalScale, scaleTime, 0f);
@@ -105,6 +105,8 @@ public class Card : MonoBehaviour
         MySpriteRenderer.sortingOrder = MyCardHolder.OrderInLayer;
     }
 
+    // called by CardMarker child to parent card to  move to new position (bully card's old position) in player's hand
+    // swaps CardHolder references 
     public CardHolder ShiftPosition(CardHolder bullyCardHolder)
     {
         CardHolder oldCardHolder = MyCardHolder;
@@ -114,25 +116,29 @@ public class Card : MonoBehaviour
         MySpriteRenderer.sortingOrder = MyCardHolder.OrderInLayer;
 
         return oldCardHolder;
-
     }
 
+    // called by child CardMarker of bully card when hitting another card in player's hand to swap CardHolder references
     public void CallForShift(Collider2D col)
     {
         CardHolder bullyCardHolder = MyCardHolder;
 
         CardMarker hitCardMarker = col.transform.GetComponent<CardMarker>();
 
+        // calls function that swaps CardHolder references between player controlled bully card and card being hit
         MyCardHolder = hitCardMarker.ShiftPosition(bullyCardHolder);
     }
 
+
     void OnTriggerEnter2D(Collider2D col)
     {
+        // do not run this function if I am the discard pile
         if (gameObject.tag == "DiscardPile")
         {
             return;
         }
 
+        // called when player chosen card is placed onto the discard pile to check if it is a valid card
         if (col.transform.tag == "DiscardPile")
         {
 

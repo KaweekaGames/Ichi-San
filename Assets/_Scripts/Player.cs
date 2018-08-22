@@ -56,34 +56,6 @@ public class Player : NetworkBehaviour
 
 
 
-    //*****
-    // Functions
-    //*****
-
-    // Build hand area
-    void LayoutHandArea()
-    {
-        for (int i = 0; i < numRows; i++)
-        {
-            for (int j = 0; j < numColumns; j++)
-            {
-                Vector3 location = new Vector3(startingPoint.x + j * xInterval, startingPoint.y + i * yInterval, startingPoint.z + j * zInterval);
-
-                GameObject newCardHolder = GameObject.Instantiate(cardHolderPrefab, location, Quaternion.identity);
-
-                CardHolder cardHolder = newCardHolder.GetComponent<CardHolder>();
-
-                cardHolder.Location = location;
-
-                cardHolder.SortingLayer = sortingLayer;
-
-                cardHolder.OrderInLayer = j;
-
-                cardLocations.Add(cardHolder);
-            }
-        }
-    }
-
     private void Start()
     {
         GetMyName(myName);
@@ -92,7 +64,7 @@ public class Player : NetworkBehaviour
         {
             cardLocations = new List<CardHolder>();
 
-            LayoutHandArea(); 
+            LayoutHandArea();
         }
 
         myHand = new List<int>();
@@ -126,6 +98,37 @@ public class Player : NetworkBehaviour
             }
         }
     }
+
+
+    //*****
+    // Functions
+    //*****
+
+    // Build hand area
+    void LayoutHandArea()
+    {
+        for (int i = 0; i < numRows; i++)
+        {
+            for (int j = 0; j < numColumns; j++)
+            {
+                Vector3 location = new Vector3(startingPoint.x + j * xInterval, startingPoint.y + i * yInterval, startingPoint.z + j * zInterval);
+
+                GameObject newCardHolder = GameObject.Instantiate(cardHolderPrefab, location, Quaternion.identity);
+
+                CardHolder cardHolder = newCardHolder.GetComponent<CardHolder>();
+
+                cardHolder.Location = location;
+
+                cardHolder.SortingLayer = sortingLayer;
+
+                cardHolder.OrderInLayer = j;
+
+                cardLocations.Add(cardHolder);
+            }
+        }
+    }
+
+    // Called when added or subtracting card location area
 
     // Called by Server to add card to hand
     public void AddCard(int newCard)
