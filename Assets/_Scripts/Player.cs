@@ -11,13 +11,17 @@ public class Player : NetworkBehaviour
     [SerializeField]
     float xInterval;
     [SerializeField]
-    float yInterval;
-    [SerializeField]
     float zInterval;
     [SerializeField]
-    int numColumns;
+    float screenWidth;
     [SerializeField]
-    int numRows;
+    int numHolderLocations;
+    [SerializeField]
+    float wideInterval;
+    [SerializeField]
+    float mediuimInterval;
+    [SerializeField]
+    float shortInterval;
 
     // prefabs for displaying hand
     [SerializeField]
@@ -85,6 +89,11 @@ public class Player : NetworkBehaviour
                 }
             }
 
+            if (myHand == null)
+            {
+                myHand = new List<int>();
+            }
+
             return;
         }
 
@@ -97,6 +106,11 @@ public class Player : NetworkBehaviour
                 return;
             }
         }
+
+        if (myHand == null)
+        {
+            myHand = new List<int>();
+        }
     }
 
 
@@ -107,28 +121,108 @@ public class Player : NetworkBehaviour
     // Build hand area
     void LayoutHandArea()
     {
-        for (int i = 0; i < numRows; i++)
+        for (int i = 0; i < numHolderLocations; i++)
         {
-            for (int j = 0; j < numColumns; j++)
+            //Vector3 location = new Vector3(startingPoint.x + i * xInterval, startingPoint.y, startingPoint.z + i * zInterval);
+            // GameObject newCardHolder = Instantiate(cardHolderPrefab, location, Quaternion.identity);
+
+            GameObject newCardHolder = Instantiate(cardHolderPrefab, transform.position, Quaternion.identity);
+
+            CardHolder cardHolder = newCardHolder.GetComponent<CardHolder>();
+            //cardHolder.Index = i;
+            //cardHolder.Location = location;
+
+            cardLocations.Add(cardHolder);
+            cardHolder.SortingLayer = sortingLayer;
+            cardHolder.Occupied = false;
+            cardHolder.enabled = false;
+        }
+
+        FormatHand();
+    }
+
+    // Called to adjust hand placement when adding or subtracting cards
+    private void FormatHand()
+    {
+        //variable holders
+        List<CardHolder> occupiedCH = new List<CardHolder>();
+        List<CardHolder> emptyCH = new List<CardHolder>();
+
+        // separate occupied from unoccupied CardHolders
+        foreach (CardHolder ch in cardLocations)
+        {
+            if (ch.Occupied)
             {
-                Vector3 location = new Vector3(startingPoint.x + j * xInterval, startingPoint.y + i * yInterval, startingPoint.z + j * zInterval);
-
-                GameObject newCardHolder = GameObject.Instantiate(cardHolderPrefab, location, Quaternion.identity);
-
-                CardHolder cardHolder = newCardHolder.GetComponent<CardHolder>();
-
-                cardHolder.Location = location;
-
-                cardHolder.SortingLayer = sortingLayer;
-
-                cardHolder.OrderInLayer = j;
-
-                cardLocations.Add(cardHolder);
+                occupiedCH.Add(ch);
             }
+            else
+            {
+                emptyCH.Add(ch);
+            }
+        }
+
+        // clear master card location list so it can be repopulated with the occupied spaces first
+        cardLocations.Clear();
+
+        foreach (CardHolder ch in occupiedCH)
+        {
+            cardLocations.Add(ch);
+        }
+
+        foreach (CardHolder ch in emptyCH)
+        {
+            cardLocations.Add(ch);
+        }
+
+        if (myHand == null)
+        {
+            myHand = new List<int>();
+        }
+
+        if (myHand.Count < 8)
+        {
+            xInterval = wideInterval;
+        }
+        else if (myHand.Count >= 8 && myHand.Count < 16)
+        {
+            xInterval = mediuimInterval;
+        }
+        else
+        {
+            xInterval = shortInterval;
+        }
+
+        for (int i = 0; i < cardLocations.Count; i++)
+        {
+            float xLocation = (float) (xInterval * (.5 * (myHand.Count - 1)));
+
+            Vector3 location = new Vector3(-xLocation + i * xInterval, startingPoint.y, startingPoint.z + i * zInterval);
+
+            cardLocations[i].Location = location;
+            cardLocations[i].Index = i;
+
+            if (i<=myHand.Count)
+            {
+                cardLocations[i].enabled = true;
+            }
+        }
+
+        GameObject[] allCards = GameObject.FindGameObjectsWithTag("Card");
+
+        foreach (GameObject gO in allCards)
+        {
+            Card thisCard = gO.GetComponent<Card>();
+            thisCard.ReturnToHand();
         }
     }
 
-    // Called when added or subtracting card location area
+    // tempppppp
+    public void RemoveCard(int cardValue)
+    {
+        myHand.Remove(cardValue);
+
+        FormatHand();
+    }
 
     // Called by Server to add card to hand
     public void AddCard(int newCard)
@@ -154,8 +248,7 @@ public class Player : NetworkBehaviour
 
         bool locationFound = false;
 
-
-
+        ////////////////////////////////////////////////////////////////////////// this needs to be fixed can be infinite loop if all locations occupied  ////////////////////////////////////////////////////////
         for (int i = 0; !locationFound; i++)
         {
             if (!cardLocations[i].Occupied)
@@ -179,9 +272,10 @@ public class Player : NetworkBehaviour
         card.MyCardHolder = cardHolderRef;
 
         card.MySpriteRenderer.sortingLayerName = cardHolderRef.SortingLayer;
-        card.MySpriteRenderer.sortingOrder = cardHolderRef.OrderInLayer;
 
         myHand.Add(card.AssingedValue);
+
+        FormatHand();
     }
 
     [Command]
@@ -199,17 +293,19 @@ public class Player : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void RpcCheckMyCard(int cardValue)
+    public bool RpcCheckMyCard(int cardValue)
     {
         bool validCard = myGM.CheckCard(cardValue);
 
-        Debug.Log("this card's validity is " + validCard);
+        return validCard;
     }
 
     [Command]
-    public void CmdCheckMyCard(int cardValue)
+    public bool CmdCheckMyCard(int cardValue)
     {
-        RpcCheckMyCard(cardValue);
+        bool validCard = RpcCheckMyCard(cardValue);
+
+        return validCard;
     }
 
     public void GetMyName(string myName)
@@ -218,16 +314,20 @@ public class Player : NetworkBehaviour
     }
 
     // Check if valid play
-    public void CheckMyCard(int num)
+    public bool CheckMyCard(int num)
     {
+        bool validCard = false;
+
         if (isServer)
         {
-            RpcCheckMyCard(num);
+            validCard = RpcCheckMyCard(num);
         }
         else
         {
-            CmdCheckMyCard(num);
+            validCard = CmdCheckMyCard(num);
         }
+
+        return validCard;
     }
 
     // Check if it is my turn

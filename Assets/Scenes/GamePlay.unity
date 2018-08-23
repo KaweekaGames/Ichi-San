@@ -665,6 +665,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MySpriteRenderer: {fileID: 846173388}
   AssingedValue: 0
+  Index: 0
   MyPlayer: {fileID: 0}
   MyCardHolder: {fileID: 0}
   constantMoveTime: 0.1
@@ -890,6 +891,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MySpriteRenderer: {fileID: 1576443839}
   AssingedValue: 0
+  Index: 0
   MyPlayer: {fileID: 0}
   MyCardHolder: {fileID: 0}
   constantMoveTime: 0.1

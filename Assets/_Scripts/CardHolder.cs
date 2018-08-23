@@ -8,7 +8,7 @@ public class CardHolder : MonoBehaviour
 
     public string SortingLayer;
 
-    public int OrderInLayer;
+    public int Index;
 
     public bool Occupied = false;
 }

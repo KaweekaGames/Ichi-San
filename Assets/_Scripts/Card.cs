@@ -10,14 +10,14 @@ public class Card : MonoBehaviour
     // card value given by GameManager to player
     public int AssingedValue = 0;
 
+    // index referencing place in hand (left to right)
+    public int Index;
+
     // local player
     public Player MyPlayer;
     
     // holder for location to go back to if move is invalid
     Vector3 oldLocation;
-
-    // holder for sorting order
-    int mySortingOrder;
 
     // holder for Card Holder
     public CardHolder MyCardHolder;
@@ -102,7 +102,6 @@ public class Card : MonoBehaviour
     {
         gameObject.ScaleTo(originalScale, scaleTime, 0f);
         gameObject.MoveTo(MyCardHolder.Location, constantMoveTime, delay, moveEase);
-        MySpriteRenderer.sortingOrder = MyCardHolder.OrderInLayer;
     }
 
     // called by CardMarker child to parent card to  move to new position (bully card's old position) in player's hand
@@ -113,7 +112,6 @@ public class Card : MonoBehaviour
         MyCardHolder = bullyCardHolder;
 
         gameObject.MoveTo(MyCardHolder.Location, shiftTime, shiftDelay, snapEase);
-        MySpriteRenderer.sortingOrder = MyCardHolder.OrderInLayer;
 
         return oldCardHolder;
     }
@@ -144,9 +142,26 @@ public class Card : MonoBehaviour
 
             if (MyPlayer.TurnCheck())
             {
-                MyPlayer.CheckMyCard(AssingedValue);
+                bool validCard = MyPlayer.CheckMyCard(AssingedValue);
 
                 MyPlayer.CheckedCard = this;
+
+                if (validCard == true)
+                {
+                    //Temp test
+                    gameObject.MoveTo(col.transform.position, constantMoveTime, delay, moveEase);
+
+                    MyCardHolder.Occupied = false;
+
+                    MyPlayer.RemoveCard(AssingedValue);
+
+                    Destroy(gameObject); 
+                }
+                else
+                {
+                    touched = false;
+                    ReturnToHand();
+                }
             }
             else
             {
@@ -162,7 +177,6 @@ public class Card : MonoBehaviour
         {
             touched = true;
             gameObject.ScaleTo(scaleFactor, scaleTime, 0);
-            MySpriteRenderer.sortingOrder = 60; 
         }
     }
 
@@ -173,7 +187,6 @@ public class Card : MonoBehaviour
             touched = false;
             gameObject.ScaleTo(originalScale, scaleTime, 0f);
             gameObject.MoveTo(MyCardHolder.Location, constantMoveTime, delay, moveEase);
-            MySpriteRenderer.sortingOrder = MyCardHolder.OrderInLayer; 
         }
     }
 
@@ -196,7 +209,6 @@ public class Card : MonoBehaviour
         {
             touched = false;
             gameObject.ScaleTo(originalScale, scaleTime, 0f);
-            MySpriteRenderer.sortingOrder = MyCardHolder.OrderInLayer;
             gameObject.MoveTo(MyCardHolder.Location, constantMoveTime, delay, moveEase); 
         }
     }
