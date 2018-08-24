@@ -52,9 +52,9 @@ public class GameManager : NetworkBehaviour
 
     private void Start()
     {
-        //NetworkLobbyManager lobbyManager = FindObjectOfType<NetworkLobbyManager>();
+        NetworkLobbyManager lobbyManager = FindObjectOfType<NetworkLobbyManager>();
 
-        //ExpectedPlayerCount = lobbyManager.numPlayers;
+        ExpectedPlayerCount = lobbyManager.numPlayers;
 
         if (player0Hand == null)
         {
@@ -101,7 +101,7 @@ public class GameManager : NetworkBehaviour
             RefreshDrawPile();
         }
 
-        if(playerList.Count < 1)//ExpectedPlayerCount
+        if(playerList.Count < ExpectedPlayerCount)
         {
             GameObject [] newPlayers = GameObject.FindGameObjectsWithTag("Player");
 
@@ -229,19 +229,15 @@ public class GameManager : NetworkBehaviour
                     case 0:
                         player0Hand.Add(card);
                         break;
-
                     case 1:
                         player1Hand.Add(card);
                         break;
-
                     case 2:
                         player2Hand.Add(card);
                         break;
-
                     case 3:
                         player3Hand.Add(card);
                         break;
-
                     default:
                         break;
                 }
@@ -263,34 +259,58 @@ public class GameManager : NetworkBehaviour
     // *****
 
     // Function returns true if card is a played leagally
-    public bool CheckCard(int cardValue)
+    public void CheckCard(int cardValue)
     {
-        bool acceptedCard = false;
+        Debug.Log("gm is checking card");
+
+        int actionNumber = 0;
 
         if (CheckJack(cardValue))
         {
-            // TODO jack function
+            actionNumber = 11;
 
-            acceptedCard = true;
+            playerList[playerTurn].TakeAction(actionNumber);
 
-            return acceptedCard;
+            return;
         }
 
         if (CheckSuit(cardValue))
         {
-            acceptedCard = true;
-
-            CheckSpecial(cardValue);
+            actionNumber = CheckSpecial(cardValue);
         }
 
         if (CheckRank(cardValue))
         {
-            acceptedCard = true;
-
-            CheckSpecial(cardValue);
+            actionNumber = CheckSpecial(cardValue);
         }
 
-        return acceptedCard;
+        if (actionNumber>0)
+        {
+            DiscardPileCardValue = cardValue;
+            discardPile.Add(cardValue);
+
+            switch (playerTurn)
+            {
+                case 0:
+                    player0Hand.Remove(cardValue);
+                    break;
+                case 1:
+                    player1Hand.Remove(cardValue);
+                    break;
+                case 2:
+                    player2Hand.Remove(cardValue);
+                    break;
+                case 3:
+                    player3Hand.Remove(cardValue);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        playerList[playerTurn].TakeAction(actionNumber);
+
+        ChangePlayerTurn();
     }
 
     // Function returns true if card suit matches discard pile card suit
@@ -332,29 +352,36 @@ public class GameManager : NetworkBehaviour
     {
         bool isJack = false;
 
-        isJack = ((cardValue % 100) == 12);
+        isJack = ((cardValue % 100) == 11);
 
         return isJack;
     }
 
     // Function to see if a 7 or 8 has been played
     // If true calls for special actions to be performed 
-    private void CheckSpecial(int cardValue)
+    private int CheckSpecial(int cardValue)
     {
+        int actionNumber = 1;
+
         if ((cardValue % 100) == 7)
         {
-            //TODO enter draw 2 state
+            actionNumber = 7;
         }
         else if ((cardValue % 100) == 8)
         {
-            //TODO skip turn state
+            actionNumber = 8;
         }
-        else return;
+
+        return actionNumber;
     }
 
     //temp
     public void ChangePlayerTurn()
     {
-        playerTurn = 1;
+        if (playerTurn == 0)
+        {
+            playerTurn = 1;
+        }
+        else playerTurn = 0;
     }
 }

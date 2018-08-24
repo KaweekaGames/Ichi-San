@@ -36,6 +36,7 @@ public class Card : MonoBehaviour
     public bool touched;
     Vector3 targetPos;
     Vector3 originalScale;
+    bool locked = false;
 
     // sprites for cards
     [SerializeField]
@@ -60,6 +61,8 @@ public class Card : MonoBehaviour
     public void SetValue(int value)
     {
         AssingedValue = value;
+
+        gameObject.name = ("Card " + AssingedValue);
 
         int suit = AssingedValue / 100;
 
@@ -139,29 +142,14 @@ public class Card : MonoBehaviour
         // called when player chosen card is placed onto the discard pile to check if it is a valid card
         if (col.transform.tag == "DiscardPile")
         {
-
             if (MyPlayer.TurnCheck())
             {
-                bool validCard = MyPlayer.CheckMyCard(AssingedValue);
+                touched = false;
+                onDiscardPile = true;
+                gameObject.MoveTo(col.transform.position, constantMoveTime, delay, moveEase);
 
-                MyPlayer.CheckedCard = this;
-
-                if (validCard == true)
-                {
-                    //Temp test
-                    gameObject.MoveTo(col.transform.position, constantMoveTime, delay, moveEase);
-
-                    MyCardHolder.Occupied = false;
-
-                    MyPlayer.RemoveCard(AssingedValue);
-
-                    Destroy(gameObject); 
-                }
-                else
-                {
-                    touched = false;
-                    ReturnToHand();
-                }
+                StartCoroutine("Wait");
+                //MyPlayer.CheckMyCard(this);
             }
             else
             {
@@ -173,7 +161,7 @@ public class Card : MonoBehaviour
 
     void OnTouchDown()
     {
-        if (touched == false)
+        if (touched == false && locked == false)
         {
             touched = true;
             gameObject.ScaleTo(scaleFactor, scaleTime, 0);
@@ -192,7 +180,7 @@ public class Card : MonoBehaviour
 
     void OnTouchStay(Vector2 point)
     {
-        if (touched == true)
+        if (touched == true && locked == false)
         {
             targetPos = new Vector3(point.x, point.y, shiftedZPosition); 
         }
@@ -211,5 +199,26 @@ public class Card : MonoBehaviour
             gameObject.ScaleTo(originalScale, scaleTime, 0f);
             gameObject.MoveTo(MyCardHolder.Location, constantMoveTime, delay, moveEase); 
         }
+    }
+
+    public void InValidCard()
+    {
+        Debug.Log("invalid");
+        onDiscardPile = false;
+        ReturnToHand();
+    }
+
+    public void ValidCard()
+    {
+        Debug.Log("valid");
+        MyCardHolder.Occupied = false;
+        MyPlayer.RemoveCard(AssingedValue);
+        Destroy(gameObject);
+    }
+
+    IEnumerator Wait()
+    {
+        yield return new WaitForSeconds(.75f);
+        MyPlayer.CheckMyCard(this);
     }
 }

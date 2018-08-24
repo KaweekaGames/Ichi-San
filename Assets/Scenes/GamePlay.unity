@@ -524,7 +524,7 @@ MonoBehaviour:
   player1CardsLeft: 0
   player2CardsLeft: 0
   player3CardsLeft: 0
-  ExpectedPlayerCount: 1
+  ExpectedPlayerCount: 2
   DiscardPileCard: {fileID: 1576443841}
   DrawPileCard: {fileID: 846173390}
   playerNames: []

@@ -59,8 +59,7 @@ public class Player : NetworkBehaviour
     bool recievedMyInt = false;
 
 
-
-    private void Start()
+    public override void OnStartClient()
     {
         GetMyName(myName);
 
@@ -121,6 +120,11 @@ public class Player : NetworkBehaviour
     // Build hand area
     void LayoutHandArea()
     {
+        if (cardLocations == null)
+        {
+            cardLocations = new List<CardHolder>();
+        }
+
         for (int i = 0; i < numHolderLocations; i++)
         {
             //Vector3 location = new Vector3(startingPoint.x + i * xInterval, startingPoint.y, startingPoint.z + i * zInterval);
@@ -246,6 +250,11 @@ public class Player : NetworkBehaviour
             return;
         }
 
+        if (cardLocations == null)
+        {
+            LayoutHandArea();
+        }
+
         bool locationFound = false;
 
         ////////////////////////////////////////////////////////////////////////// this needs to be fixed can be infinite loop if all locations occupied  ////////////////////////////////////////////////////////
@@ -293,41 +302,79 @@ public class Player : NetworkBehaviour
     }
 
     [ClientRpc]
-    public bool RpcCheckMyCard(int cardValue)
+    public void RpcCheckMyCard(int cardValue)
     {
-        bool validCard = myGM.CheckCard(cardValue);
+        myGM.CheckCard(cardValue);
+    }
 
-        return validCard;
+    [ClientRpc]
+    public void RpcTakeAction(int actionNumber)
+    {
+        Debug.Log("action number is " + actionNumber);
+
+        if (actionNumber == 0)
+        {
+            CheckedCard.InValidCard();
+            CheckedCard = null;
+        }
+        else if(actionNumber > 0)
+        {
+            CheckedCard.ValidCard();
+            CheckedCard = null;
+        }
     }
 
     [Command]
-    public bool CmdCheckMyCard(int cardValue)
+    public void CmdCheckMyCard(int cardValue)
     {
-        bool validCard = RpcCheckMyCard(cardValue);
+         RpcCheckMyCard(cardValue);
 
-        return validCard;
     }
 
-    public void GetMyName(string myName)
+    [Command]
+    public void CmdTakeAction(int actionNumber)
     {
-        gameObject.name = myName;
+        RpcTakeAction(actionNumber);
+
     }
 
     // Check if valid play
-    public bool CheckMyCard(int num)
+    public void CheckMyCard(Card discardedCard)
     {
-        bool validCard = false;
+        CheckedCard = discardedCard;
 
         if (isServer)
         {
-            validCard = RpcCheckMyCard(num);
+            RpcCheckMyCard(CheckedCard.AssingedValue);
         }
         else
         {
-            validCard = CmdCheckMyCard(num);
+            CmdCheckMyCard(CheckedCard.AssingedValue);
+        }
+    }
+
+    // Called by Server in response of played card
+    public void TakeAction(int actionNumber)
+    {
+        if (!isLocalPlayer)
+        {
+            return;
         }
 
-        return validCard;
+        if (isServer)
+        {
+            RpcTakeAction(actionNumber);
+        }
+        else
+        {
+            CmdTakeAction(actionNumber);
+        }
+    }
+
+    // Assign name to gameobject from lobby screne
+    public void GetMyName(string myName)
+    {
+        gameObject.name = myName;
     }
 
     // Check if it is my turn
