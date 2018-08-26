@@ -89,13 +89,15 @@ MonoBehaviour:
   zInterval: -0.05
   screenWidth: 15
   numHolderLocations: 24
-  wideInterval: 1
-  mediuimInterval: 0.7
-  shortInterval: 0.4
+  wideInterval: 1.2
+  mediuimInterval: 1
+  shortInterval: 0.7
   cardPrefab: {fileID: 1485943206030364, guid: a8fded08c73ed5c4b9a14425d0ae0e66, type: 2}
   cardHolderPrefab: {fileID: 1298626017570132, guid: 043034eaae7f08041a8751225d9115f2,
     type: 2}
   sortingLayer: CardSortingLayer
+  MyGm: {fileID: 0}
   MyInt: 5
   myName: nobody
   CheckedCard: {fileID: 0}
+  ImReady: 0

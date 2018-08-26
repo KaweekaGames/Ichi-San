@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UI;   
 
 public class GameManager : NetworkBehaviour
 {
@@ -50,60 +51,47 @@ public class GameManager : NetworkBehaviour
 
     bool handDealt = false;
 
+    public Text buttonText;
+
     private void Start()
     {
+        if (!isServer)
+        {
+            return;
+        }
+
         NetworkLobbyManager lobbyManager = FindObjectOfType<NetworkLobbyManager>();
 
         ExpectedPlayerCount = lobbyManager.numPlayers;
 
-        if (player0Hand == null)
-        {
-            player0Hand = new List<int>();
-        }
+        // Initialize lists
+        player0Hand = new List<int>();
+        player1Hand = new List<int>();
+        player2Hand = new List<int>();
+        player3Hand = new List<int>();
 
-        if (player1Hand == null)
-        {
-            player1Hand = new List<int>();
-        }
-
-        if (player2Hand == null)
-        {
-            player2Hand = new List<int>();
-        }
-
-        if (player3Hand == null)
-        {
-            player3Hand = new List<int>();
-        }
-
-        if (playerList == null)
-        {
-            playerList = new List<Player>();
-        }
-
-        if (discardPile == null)
-        {
-            discardPile = new List<int>();
-        }
+        // Initialize lists
+        playerList = new List<Player>();
+        discardPile = new List<int>();
+        drawPile = new List<int>();
 
     }
 
     void Update()
     {
         if (!isServer)
-        {
-            // TODO local actions
+        { 
             return;
         }
 
-        if (drawPile != null && drawPile.Count < 1)
+        if (handDealt && drawPile != null && drawPile.Count < 1)
         {
             RefreshDrawPile();
         }
 
-        if(playerList.Count < ExpectedPlayerCount)
+        if (playerList.Count < ExpectedPlayerCount)
         {
-            GameObject [] newPlayers = GameObject.FindGameObjectsWithTag("Player");
+            GameObject[] newPlayers = GameObject.FindGameObjectsWithTag("Player");
 
             foreach (GameObject gO in newPlayers)
             {
@@ -112,18 +100,32 @@ public class GameManager : NetworkBehaviour
                 if (!playerList.Contains(newPlayerScript))
                 {
                     AddPlayer(gO);
-                } 
+                }
             }
-        }
 
-        //Temp
-        if (playerList.Count == ExpectedPlayerCount && !handDealt)
-        {
-            DealCards(standardDeck);
+            buttonText.text = playerList.Count.ToString();
         }
-
     }
 
+    //temp button start
+    public void startRound()
+    {
+        if (isServer)
+        {
+            DealCards(standardDeck); 
+        }
+        else
+        {
+            CmdStartRound();
+        }
+    }
+
+    [Command]
+    void CmdStartRound()
+    {
+        DealCards(standardDeck);
+    }
+    
     // Add player to list of players and assign their turn number (MyInt)
     public void AddPlayer(GameObject newPlayer)
     {
@@ -147,6 +149,8 @@ public class GameManager : NetworkBehaviour
         playerNames.Add(newName);
 
         int playerNamesLength = playerNames.Count;
+
+        player.MyGm = this;
     }
 
     // Update discharge pile card sprite
@@ -205,6 +209,8 @@ public class GameManager : NetworkBehaviour
     // Function deals cards to players to start round
     private void DealCards(List<int> cardDeck)
     {
+        
+
         // Generate draw pile from a fresh deck
         drawPile = ShuffleDeck(cardDeck);
 
@@ -261,7 +267,10 @@ public class GameManager : NetworkBehaviour
     // Function returns true if card is a played leagally
     public void CheckCard(int cardValue)
     {
-        Debug.Log("gm is checking card");
+        if (!isServer)
+        {
+            return;
+        }
 
         int actionNumber = 0;
 
@@ -270,6 +279,29 @@ public class GameManager : NetworkBehaviour
             actionNumber = 11;
 
             playerList[playerTurn].TakeAction(actionNumber);
+
+            DiscardPileCardValue = cardValue;
+            discardPile.Add(cardValue);
+
+            switch (playerTurn)
+            {
+                case 0:
+                    player0Hand.Remove(cardValue);
+                    break;
+                case 1:
+                    player1Hand.Remove(cardValue);
+                    break;
+                case 2:
+                    player2Hand.Remove(cardValue);
+                    break;
+                case 3:
+                    player3Hand.Remove(cardValue);
+                    break;
+                default:
+                    break;
+            }
+
+            ChangePlayerTurn();
 
             return;
         }
@@ -310,7 +342,14 @@ public class GameManager : NetworkBehaviour
 
         playerList[playerTurn].TakeAction(actionNumber);
 
+        Debug.Log("called playert turn");
         ChangePlayerTurn();
+
+        int rnn = Random.Range(0, 10000);
+
+        string newText = "I'm now " + rnn.ToString();
+
+        buttonText.text = newText;
     }
 
     // Function returns true if card suit matches discard pile card suit
@@ -375,13 +414,78 @@ public class GameManager : NetworkBehaviour
         return actionNumber;
     }
 
-    //temp
-    public void ChangePlayerTurn()
+    [Command]
+    void CmdChangePlayerTurn()
     {
-        if (playerTurn == 0)
+        //RpcChangePlayerTurn();
+
+        if (playerTurn < playerList.Count - 1)
         {
-            playerTurn = 1;
+            playerTurn++;
         }
         else playerTurn = 0;
+    }
+
+    //[ClientRpc]
+    //void RpcChangePlayerTurn()
+    //{
+    //    if (!isServer)
+    //    {
+    //        return;
+    //    }
+
+    //    if (playerTurn == 0)
+    //    {
+    //        playerTurn = 1;
+    //    }
+    //    else playerTurn = 0;
+    //}
+
+    ////temp
+    public void ChangePlayerTurn()
+    {
+        if (isServer)
+        {
+            if (playerTurn < playerList.Count - 1)
+            {
+                playerTurn++;
+            }
+            else playerTurn = 0;
+        }
+        else
+        {
+            CmdChangePlayerTurn();
+        }
+    }
+
+    public void DrawCard()
+    {
+        int rNum = Random.Range(0, drawPile.Count);
+
+        int card = drawPile[rNum];
+
+        drawPile.RemoveAt(rNum);
+
+        // set player turn so only that player can recive this card
+        playerList[playerTurn].AddCard(card);
+
+        // Add cards to reference to each players hand
+        switch (playerTurn)
+        {
+            case 0:
+                player0Hand.Add(card);
+                break;
+            case 1:
+                player1Hand.Add(card);
+                break;
+            case 2:
+                player2Hand.Add(card);
+                break;
+            case 3:
+                player3Hand.Add(card);
+                break;
+            default:
+                break;
+        }
     }
 }

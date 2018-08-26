@@ -40,7 +40,7 @@ public class Player : NetworkBehaviour
     List<int> myHand;
 
     // reference to GameManager
-    GameManager myGM;
+    public GameManager MyGm;
 
     // number given by GM to determin play order
     [SyncVar]
@@ -55,6 +55,8 @@ public class Player : NetworkBehaviour
 
     // reference to cardHolder
     CardHolder cardHolderRef;
+
+    public bool ImReady = false;
 
     bool recievedMyInt = false;
 
@@ -71,6 +73,8 @@ public class Player : NetworkBehaviour
         }
 
         myHand = new List<int>();
+
+        MyGm = FindObjectOfType<GameManager>();
     }
 
     // Update is called once per frame
@@ -78,37 +82,27 @@ public class Player : NetworkBehaviour
     {
         if (!isLocalPlayer)
         {
-            if (myGM == null)
-            {
-                myGM = FindObjectOfType<GameManager>();
-
-                if (myGM == null)
-                {
-                    return;
-                }
-            }
-
-            if (myHand == null)
-            {
-                myHand = new List<int>();
-            }
-
             return;
         }
 
-        if (myGM == null)
+        if (MyGm == null)
         {
-            myGM = FindObjectOfType<GameManager>();
+            MyGm = FindObjectOfType<GameManager>();
 
-            if (myGM == null)
+            if (MyGm == null)
             {
                 return;
             }
         }
 
-        if (myHand == null)
+        //if (myHand == null)
+        //{
+        //    myHand = new List<int>();
+        //}
+
+        if (!ImReady)
         {
-            myHand = new List<int>();
+            LayoutHandArea();
         }
     }
 
@@ -120,6 +114,8 @@ public class Player : NetworkBehaviour
     // Build hand area
     void LayoutHandArea()
     {
+        Debug.Log("laying out hand");
+
         if (cardLocations == null)
         {
             cardLocations = new List<CardHolder>();
@@ -127,14 +123,10 @@ public class Player : NetworkBehaviour
 
         for (int i = 0; i < numHolderLocations; i++)
         {
-            //Vector3 location = new Vector3(startingPoint.x + i * xInterval, startingPoint.y, startingPoint.z + i * zInterval);
-            // GameObject newCardHolder = Instantiate(cardHolderPrefab, location, Quaternion.identity);
 
             GameObject newCardHolder = Instantiate(cardHolderPrefab, transform.position, Quaternion.identity);
 
             CardHolder cardHolder = newCardHolder.GetComponent<CardHolder>();
-            //cardHolder.Index = i;
-            //cardHolder.Location = location;
 
             cardLocations.Add(cardHolder);
             cardHolder.SortingLayer = sortingLayer;
@@ -143,6 +135,8 @@ public class Player : NetworkBehaviour
         }
 
         FormatHand();
+
+        ImReady = true;
     }
 
     // Called to adjust hand placement when adding or subtracting cards
@@ -183,11 +177,11 @@ public class Player : NetworkBehaviour
             myHand = new List<int>();
         }
 
-        if (myHand.Count < 8)
+        if (myHand.Count < 11)
         {
             xInterval = wideInterval;
         }
-        else if (myHand.Count >= 8 && myHand.Count < 16)
+        else if (myHand.Count >= 11 && myHand.Count < 17)
         {
             xInterval = mediuimInterval;
         }
@@ -235,10 +229,10 @@ public class Player : NetworkBehaviour
         {
             RpcAddCard(newCard);
         }
-        else
-        {
-            CmdAddCard(newCard);
-        }
+        //else
+        //{
+        //    CmdAddCard(newCard);
+        //}
 
     }
 
@@ -287,11 +281,11 @@ public class Player : NetworkBehaviour
         FormatHand();
     }
 
-    [Command]
-    public void CmdAddCard(int newCard)
-    {
-        RpcAddCard(newCard);
-    }
+    //[Command]
+    //public void CmdAddCard(int newCard)
+    //{
+    //    RpcAddCard(newCard);
+    //}
 
     [ClientRpc]
     public void RpcGetNumber(int number)
@@ -301,16 +295,23 @@ public class Player : NetworkBehaviour
         recievedMyInt = true;
     }
 
-    [ClientRpc]
-    public void RpcCheckMyCard(int cardValue)
-    {
-        myGM.CheckCard(cardValue);
-    }
+    //[ClientRpc]
+    //public void RpcCheckMyCard(int cardValue)
+    //{
+    //    Debug.Log("checking the card" + gameObject.name);
+
+    //    MyGm.CheckCard(cardValue);
+    //}
 
     [ClientRpc]
     public void RpcTakeAction(int actionNumber)
     {
         Debug.Log("action number is " + actionNumber);
+
+        if (!isLocalPlayer || CheckedCard == null)
+        {
+            return;
+        }
 
         if (actionNumber == 0)
         {
@@ -327,8 +328,8 @@ public class Player : NetworkBehaviour
     [Command]
     public void CmdCheckMyCard(int cardValue)
     {
-         RpcCheckMyCard(cardValue);
-
+        //RpcCheckMyCard(cardValue);
+        MyGm.CheckCard(cardValue);
     }
 
     [Command]
@@ -341,29 +342,35 @@ public class Player : NetworkBehaviour
     // Check if valid play
     public void CheckMyCard(Card discardedCard)
     {
+        if (!isLocalPlayer || MyInt != MyGm.playerTurn)
+        {
+            return;
+        }
+
         CheckedCard = discardedCard;
+
+        int value = CheckedCard.AssingedValue;
 
         if (isServer)
         {
-            RpcCheckMyCard(CheckedCard.AssingedValue);
+            Debug.Log("RPC checking the card");
+            //RpcCheckMyCard(value);
+            MyGm.CheckCard(value);
         }
         else
         {
-            CmdCheckMyCard(CheckedCard.AssingedValue);
+            Debug.Log("Cmd checking the card");
+            CmdCheckMyCard(value);
         }
     }
 
     // Called by Server in response of played card
     public void TakeAction(int actionNumber)
     {
-        if (!isLocalPlayer)
-        {
-            return;
-        }
-
         if (isServer)
         {
             RpcTakeAction(actionNumber);
+
         }
         else
         {
@@ -380,7 +387,7 @@ public class Player : NetworkBehaviour
     // Check if it is my turn
     public bool TurnCheck()
     {
-        bool itIsMyTurn = (MyInt == myGM.playerTurn);
+        bool itIsMyTurn = (MyInt == MyGm.playerTurn);
 
         return itIsMyTurn;
     }
