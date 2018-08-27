@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UI;
 
 public class Player : NetworkBehaviour
 {
@@ -63,6 +64,8 @@ public class Player : NetworkBehaviour
     GameObject drawPile;
 
     public GameObject DrawCardPrefab;
+
+    public GameObject ButtonPreFab;
 
     public override void OnStartClient()
     {
@@ -236,7 +239,7 @@ public class Player : NetworkBehaviour
     public void RemoveCard(int cardValue)
     {
         myHand.Remove(cardValue);
-
+        CheckedCard = null;
         FormatHand();
     }
 
@@ -350,7 +353,6 @@ public class Player : NetworkBehaviour
         else if (actionNumber > 0)
         {
             CheckedCard.ValidCard();
-            CheckedCard = null;
         }
     }
 
@@ -397,16 +399,32 @@ public class Player : NetworkBehaviour
 
     public Vector3 FindLandingSpot()
     {
-        Vector3 landingSpot = new Vector3();
+        Vector3 landingSpot = cardLocations[myHand.Count].Location;
 
-        foreach (CardHolder cH in cardLocations)
-        {
-            if (!cH.Occupied && cH.enabled == true)
-            {
-                landingSpot = cH.Location;
-            }
-        }
+        GameObject gO = Instantiate(DrawCardPrefab, drawPile.transform.position, Quaternion.identity);
+        DrawCard drawCard = gO.GetComponent<DrawCard>();
+
+        drawCard.MyPlayer = this;
 
         return landingSpot;
+    }
+
+    // End turn
+    public void EndMyTurn()
+    {
+        if (isServer)
+        {
+            MyGm.ChangePlayerTurn();
+        }
+        else
+        {
+            CmdEndMyTurn();
+        }
+    }
+
+    [Command]
+    void CmdEndMyTurn()
+    {
+        MyGm.ChangePlayerTurn();
     }
 }

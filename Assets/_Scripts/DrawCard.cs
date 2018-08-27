@@ -15,7 +15,7 @@ public class DrawCard : MonoBehaviour
     public float Delay = 0f;
     public EaseType MoveEase;
     public float shiftedZPosition = -1.6f;
-    bool touched;
+    bool touched = false;
     bool inHand;
     Vector3 targetPos;
     Vector3 landingSpot;
@@ -82,7 +82,7 @@ public class DrawCard : MonoBehaviour
     // Actions when leaving Draw Pile
     void OnTriggerExit2D(Collider2D col)
     {
-        if (col.transform.tag == "DrawPile")
+        if (touched && col.transform.tag == "DrawPile")
         {
 
             Debug.Log("exiting");
@@ -94,7 +94,7 @@ public class DrawCard : MonoBehaviour
                 touched = false;
                 inHand = true;
 
-                //StartCoroutine("Wait");
+                StartCoroutine("Wait");
             }
             else
             {
@@ -104,4 +104,11 @@ public class DrawCard : MonoBehaviour
         }
     }
 
+    IEnumerator Wait()
+    {
+        yield return new WaitForSeconds(.4f);
+        MyPlayer.DrawCard();
+        gameObject.transform.position = MyLocation;
+        Destroy(gameObject);
+    }
 }

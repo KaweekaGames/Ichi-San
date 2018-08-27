@@ -103,3 +103,5 @@ MonoBehaviour:
   ImReady: 0
   DrawCardPrefab: {fileID: 1061550760158746, guid: 66ebcb9e22ce44a479e45d3486564dc3,
     type: 2}
+  ButtonPreFab: {fileID: 1091666090254054, guid: ccec1e67f7b5bf3449ae3dfae328f97f,
+    type: 2}
