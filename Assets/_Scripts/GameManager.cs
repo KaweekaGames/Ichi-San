@@ -27,7 +27,9 @@ public class GameManager : NetworkBehaviour
 
     public Card DiscardPileCard;
 
-    public Card DrawPileCard;
+    public SpriteRenderer DrawPileSpriteRenderer;
+
+    public Sprite[] DrawPileSprites;
 
     public List<string> playerNames;
 
@@ -84,10 +86,10 @@ public class GameManager : NetworkBehaviour
             return;
         }
 
-        if (handDealt && drawPile != null && drawPile.Count < 1)
-        {
-            RefreshDrawPile();
-        }
+        //if (handDealt && drawPile != null && drawPile.Count < 1)
+        //{
+        //    RefreshDrawPile();
+        //}
 
         if (playerList.Count < ExpectedPlayerCount)
         {
@@ -114,18 +116,8 @@ public class GameManager : NetworkBehaviour
         {
             DealCards(standardDeck); 
         }
-        else
-        {
-            CmdStartRound();
-        }
     }
 
-    [Command]
-    void CmdStartRound()
-    {
-        DealCards(standardDeck);
-    }
-    
     // Add player to list of players and assign their turn number (MyInt)
     public void AddPlayer(GameObject newPlayer)
     {
@@ -153,7 +145,7 @@ public class GameManager : NetworkBehaviour
         player.MyGm = this;
     }
 
-    // Update discharge pile card sprite
+    // Linked to Syncar, updates discharge pile card sprite
     void UpdateDiscardPileCard(int DiscardPileCardValue)
     {
         DiscardPileCard.SetValue(DiscardPileCardValue);
@@ -201,9 +193,15 @@ public class GameManager : NetworkBehaviour
     // Function replinishes draw pile if it runs out
     private void RefreshDrawPile()
     {
-        discardPile.RemoveAt(discardPile.Count - 1);
+        discardPile.Remove(DiscardPileCardValue);
 
         drawPile = ShuffleDeck(discardPile);
+
+        DrawPileSpriteRenderer.sprite = DrawPileSprites[0];
+
+        discardPile.Clear();
+
+        discardPile.Add(DiscardPileCardValue);
     }
 
     // Function deals cards to players to start round
@@ -318,6 +316,8 @@ public class GameManager : NetworkBehaviour
 
         if (actionNumber>0)
         {
+            playerList[playerTurn].TakeAction(actionNumber);
+
             DiscardPileCardValue = cardValue;
             discardPile.Add(cardValue);
 
@@ -338,18 +338,13 @@ public class GameManager : NetworkBehaviour
                 default:
                     break;
             }
+
+            ChangePlayerTurn();
         }
-
-        playerList[playerTurn].TakeAction(actionNumber);
-
-        Debug.Log("called playert turn");
-        ChangePlayerTurn();
-
-        int rnn = Random.Range(0, 10000);
-
-        string newText = "I'm now " + rnn.ToString();
-
-        buttonText.text = newText;
+        else
+        {
+            playerList[playerTurn].TakeAction(actionNumber);
+        }
     }
 
     // Function returns true if card suit matches discard pile card suit
@@ -414,33 +409,6 @@ public class GameManager : NetworkBehaviour
         return actionNumber;
     }
 
-    [Command]
-    void CmdChangePlayerTurn()
-    {
-        //RpcChangePlayerTurn();
-
-        if (playerTurn < playerList.Count - 1)
-        {
-            playerTurn++;
-        }
-        else playerTurn = 0;
-    }
-
-    //[ClientRpc]
-    //void RpcChangePlayerTurn()
-    //{
-    //    if (!isServer)
-    //    {
-    //        return;
-    //    }
-
-    //    if (playerTurn == 0)
-    //    {
-    //        playerTurn = 1;
-    //    }
-    //    else playerTurn = 0;
-    //}
-
     ////temp
     public void ChangePlayerTurn()
     {
@@ -452,40 +420,44 @@ public class GameManager : NetworkBehaviour
             }
             else playerTurn = 0;
         }
-        else
-        {
-            CmdChangePlayerTurn();
-        }
     }
 
     public void DrawCard()
     {
-        int rNum = Random.Range(0, drawPile.Count);
-
-        int card = drawPile[rNum];
-
-        drawPile.RemoveAt(rNum);
-
-        // set player turn so only that player can recive this card
-        playerList[playerTurn].AddCard(card);
-
-        // Add cards to reference to each players hand
-        switch (playerTurn)
+        if (isServer)
         {
-            case 0:
-                player0Hand.Add(card);
-                break;
-            case 1:
-                player1Hand.Add(card);
-                break;
-            case 2:
-                player2Hand.Add(card);
-                break;
-            case 3:
-                player3Hand.Add(card);
-                break;
-            default:
-                break;
+            int rNum = Random.Range(0, drawPile.Count);
+
+            int card = drawPile[rNum];
+
+            drawPile.RemoveAt(rNum);
+
+            if (drawPile.Count <= 1)
+            {
+                DrawPileSpriteRenderer.sprite = DrawPileSprites[1];
+            }
+
+            // set player turn so only that player can recive this card
+            playerList[playerTurn].AddCard(card);
+
+            // Add cards to reference to each players hand
+            switch (playerTurn)
+            {
+                case 0:
+                    player0Hand.Add(card);
+                    break;
+                case 1:
+                    player1Hand.Add(card);
+                    break;
+                case 2:
+                    player2Hand.Add(card);
+                    break;
+                case 3:
+                    player3Hand.Add(card);
+                    break;
+                default:
+                    break; 
+            }
         }
     }
 }

@@ -88,7 +88,7 @@ MonoBehaviour:
   xInterval: 0.8
   zInterval: -0.05
   screenWidth: 15
-  numHolderLocations: 24
+  numHolderLocations: 48
   wideInterval: 1.2
   mediuimInterval: 1
   shortInterval: 0.7
@@ -101,3 +101,5 @@ MonoBehaviour:
   myName: nobody
   CheckedCard: {fileID: 0}
   ImReady: 0
+  DrawCardPrefab: {fileID: 1061550760158746, guid: 66ebcb9e22ce44a479e45d3486564dc3,
+    type: 2}

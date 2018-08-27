@@ -31,6 +31,7 @@ public class Card : MonoBehaviour
     public float shiftedZPosition = -1.6f;
     public EaseType moveEase;
     public EaseType snapEase;
+    public EaseType discardEase;
     public Vector3 scaleFactor;
     public bool onDiscardPile = false;
     public bool touched;
@@ -103,8 +104,8 @@ public class Card : MonoBehaviour
     // called to move card back to player's hand
     public void ReturnToHand()
     {
-        gameObject.ScaleTo(originalScale, scaleTime, 0f);
         gameObject.MoveTo(MyCardHolder.Location, constantMoveTime, delay, moveEase);
+        //gameObject.ScaleTo(originalScale, scaleTime, 0f);
     }
 
     // called by CardMarker child to parent card to  move to new position (bully card's old position) in player's hand
@@ -130,7 +131,7 @@ public class Card : MonoBehaviour
         MyCardHolder = hitCardMarker.ShiftPosition(bullyCardHolder);
     }
 
-
+    // Actions when placing card on Discharge Pile
     void OnTriggerEnter2D(Collider2D col)
     {
         // do not run this function if I am the discard pile
@@ -144,12 +145,11 @@ public class Card : MonoBehaviour
         {
             if (MyPlayer.TurnCheck())
             {
+                gameObject.MoveTo(col.transform.position, constantMoveTime, 0f, discardEase);
                 touched = false;
                 onDiscardPile = true;
-                gameObject.MoveTo(col.transform.position, constantMoveTime, delay, moveEase);
 
                 StartCoroutine("Wait");
-                //MyPlayer.CheckMyCard(this);
             }
             else
             {
@@ -164,7 +164,7 @@ public class Card : MonoBehaviour
         if (touched == false && locked == false)
         {
             touched = true;
-            gameObject.ScaleTo(scaleFactor, scaleTime, 0);
+            //gameObject.ScaleTo(scaleFactor, scaleTime, 0);
         }
     }
 
@@ -173,7 +173,7 @@ public class Card : MonoBehaviour
         if (touched == true && !onDiscardPile)
         {
             touched = false;
-            gameObject.ScaleTo(originalScale, scaleTime, 0f);
+            //gameObject.ScaleTo(originalScale, scaleTime, 0f);
             gameObject.MoveTo(MyCardHolder.Location, constantMoveTime, delay, moveEase);
         }
     }
@@ -196,7 +196,7 @@ public class Card : MonoBehaviour
         if (touched == true && !onDiscardPile)
         {
             touched = false;
-            gameObject.ScaleTo(originalScale, scaleTime, 0f);
+            //gameObject.ScaleTo(originalScale, scaleTime, 0f);
             gameObject.MoveTo(MyCardHolder.Location, constantMoveTime, delay, moveEase); 
         }
     }
@@ -211,6 +211,7 @@ public class Card : MonoBehaviour
     public void ValidCard()
     {
         Debug.Log("valid");
+        //gameObject.ScaleTo(scaleFactor, scaleTime, 0);
         MyCardHolder.Occupied = false;
         MyPlayer.RemoveCard(AssingedValue);
         Destroy(gameObject);
@@ -218,7 +219,7 @@ public class Card : MonoBehaviour
 
     IEnumerator Wait()
     {
-        yield return new WaitForSeconds(.75f);
+        yield return new WaitForSeconds(.4f);
         MyPlayer.CheckMyCard(this);
     }
 }

@@ -60,6 +60,9 @@ public class Player : NetworkBehaviour
 
     bool recievedMyInt = false;
 
+    GameObject drawPile;
+
+    public GameObject DrawCardPrefab;
 
     public override void OnStartClient()
     {
@@ -75,6 +78,8 @@ public class Player : NetworkBehaviour
         myHand = new List<int>();
 
         MyGm = FindObjectOfType<GameManager>();
+
+        
     }
 
     // Update is called once per frame
@@ -83,6 +88,20 @@ public class Player : NetworkBehaviour
         if (!isLocalPlayer)
         {
             return;
+        }
+
+        if (drawPile == null)
+        {
+            drawPile = GameObject.FindGameObjectWithTag("DrawPile");
+
+            if (drawPile != null)
+            {
+                GameObject gO = Instantiate(DrawCardPrefab, drawPile.transform.position, Quaternion.identity);
+                DrawCard drawCard = gO.GetComponent<DrawCard>();
+
+                drawCard.MyPlayer = this;
+            }
+            else Debug.Log("can't find dp");
         }
 
         if (MyGm == null)
@@ -94,11 +113,6 @@ public class Player : NetworkBehaviour
                 return;
             }
         }
-
-        //if (myHand == null)
-        //{
-        //    myHand = new List<int>();
-        //}
 
         if (!ImReady)
         {
@@ -181,13 +195,17 @@ public class Player : NetworkBehaviour
         {
             xInterval = wideInterval;
         }
-        else if (myHand.Count >= 11 && myHand.Count < 17)
+        else if (myHand.Count >= 11 && myHand.Count < 16)
         {
             xInterval = mediuimInterval;
         }
-        else
+        else if (myHand.Count >=16 && myHand.Count <24)
         {
             xInterval = shortInterval;
+        }
+        else
+        {
+            xInterval = shortInterval * .6f;
         }
 
         for (int i = 0; i < cardLocations.Count; i++)
@@ -214,7 +232,7 @@ public class Player : NetworkBehaviour
         }
     }
 
-    // tempppppp
+    // Remove Card from hand
     public void RemoveCard(int cardValue)
     {
         myHand.Remove(cardValue);
@@ -229,11 +247,6 @@ public class Player : NetworkBehaviour
         {
             RpcAddCard(newCard);
         }
-        //else
-        //{
-        //    CmdAddCard(newCard);
-        //}
-
     }
 
     [ClientRpc]
@@ -281,12 +294,6 @@ public class Player : NetworkBehaviour
         FormatHand();
     }
 
-    //[Command]
-    //public void CmdAddCard(int newCard)
-    //{
-    //    RpcAddCard(newCard);
-    //}
-
     [ClientRpc]
     public void RpcGetNumber(int number)
     {
@@ -295,20 +302,42 @@ public class Player : NetworkBehaviour
         recievedMyInt = true;
     }
 
-    //[ClientRpc]
-    //public void RpcCheckMyCard(int cardValue)
-    //{
-    //    Debug.Log("checking the card" + gameObject.name);
+    // Check if valid play
+    public void CheckMyCard(Card discardedCard)
+    {
+        CheckedCard = discardedCard;
 
-    //    MyGm.CheckCard(cardValue);
-    //}
+        int value = CheckedCard.AssingedValue;
+
+        if (isServer)
+        {
+            MyGm.CheckCard(value);
+        }
+        else
+        {
+            CmdCheckMyCard(value);
+        }
+    }
+
+    [Command]
+    public void CmdCheckMyCard(int cardValue)
+    {
+        MyGm.CheckCard(cardValue);
+    }
+
+    // Called by Server in response of played card
+    public void TakeAction(int actionNumber)
+    {
+        if (isServer)
+        {
+            RpcTakeAction(actionNumber);
+        }
+    }
 
     [ClientRpc]
     public void RpcTakeAction(int actionNumber)
     {
-        Debug.Log("action number is " + actionNumber);
-
-        if (!isLocalPlayer || CheckedCard == null)
+        if (!isLocalPlayer) //|| CheckedCard == null
         {
             return;
         }
@@ -318,63 +347,10 @@ public class Player : NetworkBehaviour
             CheckedCard.InValidCard();
             CheckedCard = null;
         }
-        else if(actionNumber > 0)
+        else if (actionNumber > 0)
         {
             CheckedCard.ValidCard();
             CheckedCard = null;
-        }
-    }
-
-    [Command]
-    public void CmdCheckMyCard(int cardValue)
-    {
-        //RpcCheckMyCard(cardValue);
-        MyGm.CheckCard(cardValue);
-    }
-
-    [Command]
-    public void CmdTakeAction(int actionNumber)
-    {
-        RpcTakeAction(actionNumber);
-
-    }
-
-    // Check if valid play
-    public void CheckMyCard(Card discardedCard)
-    {
-        if (!isLocalPlayer || MyInt != MyGm.playerTurn)
-        {
-            return;
-        }
-
-        CheckedCard = discardedCard;
-
-        int value = CheckedCard.AssingedValue;
-
-        if (isServer)
-        {
-            Debug.Log("RPC checking the card");
-            //RpcCheckMyCard(value);
-            MyGm.CheckCard(value);
-        }
-        else
-        {
-            Debug.Log("Cmd checking the card");
-            CmdCheckMyCard(value);
-        }
-    }
-
-    // Called by Server in response of played card
-    public void TakeAction(int actionNumber)
-    {
-        if (isServer)
-        {
-            RpcTakeAction(actionNumber);
-
-        }
-        else
-        {
-            CmdTakeAction(actionNumber);
         }
     }
 
@@ -390,5 +366,47 @@ public class Player : NetworkBehaviour
         bool itIsMyTurn = (MyInt == MyGm.playerTurn);
 
         return itIsMyTurn;
+    }
+
+    // Draw card
+    public void DrawCard()
+    {
+        if (!isLocalPlayer)
+        {
+            return;
+        }
+
+        if (TurnCheck())
+        {
+            if (isServer)
+            {
+                MyGm.DrawCard();
+            }
+            else
+            {
+                CmdDrawCard();
+            }
+        }
+    }
+
+    [Command]
+    void CmdDrawCard()
+    {
+        MyGm.DrawCard();
+    }
+
+    public Vector3 FindLandingSpot()
+    {
+        Vector3 landingSpot = new Vector3();
+
+        foreach (CardHolder cH in cardLocations)
+        {
+            if (!cH.Occupied && cH.enabled == true)
+            {
+                landingSpot = cH.Location;
+            }
+        }
+
+        return landingSpot;
     }
 }

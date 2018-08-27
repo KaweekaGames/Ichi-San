@@ -157,17 +157,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MySpriteRenderer: {fileID: 212827062668441700}
   AssingedValue: 0
+  Index: 0
   MyPlayer: {fileID: 0}
   MyCardHolder: {fileID: 0}
   constantMoveTime: 0.2
   delay: 0.1
   shiftDelay: 0.2
-  scaleTime: 0.1
+  scaleTime: 0.5
   shiftTime: 0.15
   shiftedZPosition: -1.6
   moveEase: 13
   snapEase: 13
-  scaleFactor: {x: 1.2, y: 1.2, z: 1}
+  discardEase: 17
+  scaleFactor: {x: 1, y: 1, z: 1}
   onDiscardPile: 0
   touched: 0
   spadeSprites:
