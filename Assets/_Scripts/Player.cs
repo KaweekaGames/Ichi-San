@@ -65,7 +65,7 @@ public class Player : NetworkBehaviour
 
     public GameObject DrawCardPrefab;
 
-    public GameObject ButtonPreFab;
+    GameObject nextTurnButton;
 
     public override void OnStartClient()
     {
@@ -115,6 +115,15 @@ public class Player : NetworkBehaviour
             {
                 return;
             }
+        }
+
+        if (nextTurnButton == null)
+        {
+            nextTurnButton = GameObject.Find("NextTurn");
+
+            Button nTButton = nextTurnButton.GetComponent<Button>();
+
+            nTButton.onClick.AddListener(EndMyTurn);
         }
 
         if (!ImReady)
@@ -412,6 +421,7 @@ public class Player : NetworkBehaviour
     // End turn
     public void EndMyTurn()
     {
+        Debug.Log("ending all of it");
         if (isServer)
         {
             MyGm.ChangePlayerTurn();
