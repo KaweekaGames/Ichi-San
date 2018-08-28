@@ -166,9 +166,9 @@ MonoBehaviour:
   scaleTime: 0.5
   shiftTime: 0.15
   shiftedZPosition: -1.6
-  moveEase: 13
-  snapEase: 13
-  discardEase: 17
+  moveEase: 2
+  snapEase: 2
+  discardEase: 2
   scaleFactor: {x: 1, y: 1, z: 1}
   onDiscardPile: 0
   touched: 0

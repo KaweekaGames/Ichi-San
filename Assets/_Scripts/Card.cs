@@ -37,7 +37,6 @@ public class Card : MonoBehaviour
     public bool touched;
     Vector3 targetPos;
     Vector3 originalScale;
-    bool locked = false;
 
     // sprites for cards
     [SerializeField]
@@ -143,7 +142,7 @@ public class Card : MonoBehaviour
         // called when player chosen card is placed onto the discard pile to check if it is a valid card
         if (col.transform.tag == "DiscardPile")
         {
-            if (MyPlayer.TurnCheck())
+            if (MyPlayer.TurnCheck() && !MyPlayer.Locked)
             {
                 gameObject.MoveTo(col.transform.position, constantMoveTime, 0f, discardEase);
                 touched = false;
@@ -161,7 +160,7 @@ public class Card : MonoBehaviour
 
     void OnTouchDown()
     {
-        if (touched == false && locked == false)
+        if (touched == false &&!MyPlayer.Locked)
         {
             touched = true;
             //gameObject.ScaleTo(scaleFactor, scaleTime, 0);
@@ -180,7 +179,7 @@ public class Card : MonoBehaviour
 
     void OnTouchStay(Vector2 point)
     {
-        if (touched == true && locked == false)
+        if (touched == true)
         {
             targetPos = new Vector3(point.x, point.y, shiftedZPosition); 
         }
@@ -203,15 +202,12 @@ public class Card : MonoBehaviour
 
     public void InValidCard()
     {
-        Debug.Log("invalid");
         onDiscardPile = false;
         ReturnToHand();
     }
 
     public void ValidCard()
     {
-        Debug.Log("valid");
-        //gameObject.ScaleTo(scaleFactor, scaleTime, 0);
         MyCardHolder.Occupied = false;
         MyPlayer.RemoveCard(AssingedValue);
         Destroy(gameObject);

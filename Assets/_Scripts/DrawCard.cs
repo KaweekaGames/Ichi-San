@@ -85,8 +85,7 @@ public class DrawCard : MonoBehaviour
         if (touched && col.transform.tag == "DrawPile")
         {
 
-            Debug.Log("exiting");
-            if (MyPlayer.TurnCheck())
+            if (MyPlayer.TurnCheck() && MyPlayer.CanDraw)
             {
                 landingSpot = MyPlayer.FindLandingSpot();
 

@@ -43,6 +43,14 @@ public class Player : NetworkBehaviour
     // reference to GameManager
     public GameManager MyGm;
 
+    // bool checking if drawing a card is allowed
+    [SyncVar]
+    public bool CanDraw = true;
+
+    // if oppenet lays down a 7 you are locked into drawing 2 cards
+    [SyncVar]
+    public bool Locked = false;
+
     // number given by GM to determin play order
     [SyncVar]
     public int MyInt;
@@ -56,13 +64,15 @@ public class Player : NetworkBehaviour
 
     // reference to cardHolder
     CardHolder cardHolderRef;
-
+   
     public bool ImReady = false;
 
     bool recievedMyInt = false;
 
+    // Reference to the draw pile
     GameObject drawPile;
 
+    // Prefab to generate draw card
     public GameObject DrawCardPrefab;
 
     GameObject nextTurnButton;
@@ -104,7 +114,6 @@ public class Player : NetworkBehaviour
 
                 drawCard.MyPlayer = this;
             }
-            else Debug.Log("can't find dp");
         }
 
         if (MyGm == null)
@@ -349,7 +358,7 @@ public class Player : NetworkBehaviour
     [ClientRpc]
     public void RpcTakeAction(int actionNumber)
     {
-        if (!isLocalPlayer) //|| CheckedCard == null
+        if (!isLocalPlayer)
         {
             return;
         }
@@ -374,7 +383,7 @@ public class Player : NetworkBehaviour
     // Check if it is my turn
     public bool TurnCheck()
     {
-        bool itIsMyTurn = (MyInt == MyGm.playerTurn);
+        bool itIsMyTurn = (MyInt == MyGm.PlayerTurn);
 
         return itIsMyTurn;
     }
@@ -387,7 +396,7 @@ public class Player : NetworkBehaviour
             return;
         }
 
-        if (TurnCheck())
+        if (TurnCheck() && MyGm.AvailableDrawCount > 0)
         {
             if (isServer)
             {
@@ -421,7 +430,11 @@ public class Player : NetworkBehaviour
     // End turn
     public void EndMyTurn()
     {
-        Debug.Log("ending all of it");
+        if (Locked || CanDraw || !TurnCheck())
+        {
+            return;
+        }
+
         if (isServer)
         {
             MyGm.ChangePlayerTurn();
@@ -436,5 +449,29 @@ public class Player : NetworkBehaviour
     void CmdEndMyTurn()
     {
         MyGm.ChangePlayerTurn();
+    }
+
+    [ClientRpc]
+    public void RpcAllowCanDraw()
+    {
+        CanDraw = true;
+    }
+
+    [ClientRpc]
+    public void RpcDenyCanDraw()
+    {
+        CanDraw = false;
+    }
+
+    [ClientRpc]
+    public void RpcLockDown()
+    {
+        Locked = true;
+    }
+
+    [ClientRpc]
+    public void RpcUnlock()
+    {
+        Locked = false;
     }
 }

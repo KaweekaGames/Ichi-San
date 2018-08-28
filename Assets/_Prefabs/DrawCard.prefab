@@ -101,9 +101,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MyPlayer: {fileID: 0}
   MyLocation: {x: 0, y: 0, z: 0}
-  MoveTime: 0.5
+  MoveTime: 0.4
   Delay: 0
-  MoveEase: 17
+  MoveEase: 2
   shiftedZPosition: -1.6
 --- !u!212 &212246168832055104
 SpriteRenderer:

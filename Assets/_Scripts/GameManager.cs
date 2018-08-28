@@ -7,21 +7,25 @@ using UnityEngine.UI;
 public class GameManager : NetworkBehaviour
 {
     [SyncVar]
-    public int playerTurn = 0;
+    public int PlayerTurn = 0;
     [SyncVar]
-    public int playerCount = 0;
+    public int PlayerCount = 0;
     [SyncVar(hook = "UpdateDiscardPileCard")]
     public int DiscardPileCardValue;
     [SyncVar]
     public int SuitOverride;
     [SyncVar]
-    public int player0CardsLeft = 0;
+    public int Player0CardsLeft = 0;
     [SyncVar]
-    public int player1CardsLeft = 0;
+    public int Player1CardsLeft = 0;
     [SyncVar]
-    public int player2CardsLeft = 0;
+    public int Player2CardsLeft = 0;
     [SyncVar]
-    public int player3CardsLeft = 0;
+    public int Player3CardsLeft = 0;
+    [SyncVar]
+    public int GameState = 0;
+    [SyncVar(hook = "UpdateCanDraw")]
+    public int AvailableDrawCount = 1;
 
     public int ExpectedPlayerCount;
 
@@ -31,7 +35,13 @@ public class GameManager : NetworkBehaviour
 
     public Sprite[] DrawPileSprites;
 
-    public List<string> playerNames;
+    public List<string> PlayerNames;
+
+    public bool Clockwise = true;
+
+    public bool Draw2 = false;
+
+    public Text ButtonText;
 
     List<Player> playerList;
 
@@ -53,7 +63,7 @@ public class GameManager : NetworkBehaviour
 
     bool handDealt = false;
 
-    public Text buttonText;
+    
 
     private void Start()
     {
@@ -105,7 +115,7 @@ public class GameManager : NetworkBehaviour
                 }
             }
 
-            buttonText.text = playerList.Count.ToString();
+            ButtonText.text = playerList.Count.ToString();
         }
     }
 
@@ -134,21 +144,40 @@ public class GameManager : NetworkBehaviour
 
         player.RpcGetNumber(nextPlayerNumber);
 
-        playerCount = playerList.Count;
+        PlayerCount = playerList.Count;
 
         string newName = player.name;
 
-        playerNames.Add(newName);
+        PlayerNames.Add(newName);
 
-        int playerNamesLength = playerNames.Count;
+        int playerNamesLength = PlayerNames.Count;
 
         player.MyGm = this;
     }
 
-    // Linked to Syncar, updates discharge pile card sprite
+    // Linked to SyncVar, updates discharge pile card sprite
     void UpdateDiscardPileCard(int DiscardPileCardValue)
     {
         DiscardPileCard.SetValue(DiscardPileCardValue);
+    }
+
+    // Linked to SyncVar, updates if player can draw a card or not
+    void UpdateCanDraw(int AvailableDrawCount)
+    {
+        if (AvailableDrawCount <= 0)
+        {
+            foreach (Player player in playerList)
+            {
+                player.RpcDenyCanDraw();
+            }
+        }
+        else
+        {
+            foreach (Player player in playerList)
+            {
+                player.RpcAllowCanDraw();
+            }
+        }
     }
 
 
@@ -216,7 +245,7 @@ public class GameManager : NetworkBehaviour
         for (int i = 0; i < 7; i++)
         {
             // Switch from player to player after each card dealt from deck
-            for (int j = 0; j < playerCount; j++)
+            for (int j = 0; j < PlayerCount; j++)
             {
                 int rNum = Random.Range(0, drawPile.Count);
 
@@ -270,18 +299,18 @@ public class GameManager : NetworkBehaviour
             return;
         }
 
-        int actionNumber = 0;
+        GameState = 0;
 
         if (CheckJack(cardValue))
         {
-            actionNumber = 11;
+            GameState = 11;
 
-            playerList[playerTurn].TakeAction(actionNumber);
+            playerList[PlayerTurn].TakeAction(GameState);
 
             DiscardPileCardValue = cardValue;
             discardPile.Add(cardValue);
 
-            switch (playerTurn)
+            switch (PlayerTurn)
             {
                 case 0:
                     player0Hand.Remove(cardValue);
@@ -306,22 +335,22 @@ public class GameManager : NetworkBehaviour
 
         if (CheckSuit(cardValue))
         {
-            actionNumber = CheckSpecial(cardValue);
+            GameState = CheckSpecial(cardValue);
         }
 
         if (CheckRank(cardValue))
         {
-            actionNumber = CheckSpecial(cardValue);
+            GameState = CheckSpecial(cardValue);
         }
 
-        if (actionNumber>0)
+        if (GameState>0)
         {
-            playerList[playerTurn].TakeAction(actionNumber);
+            playerList[PlayerTurn].TakeAction(GameState);
 
             DiscardPileCardValue = cardValue;
             discardPile.Add(cardValue);
 
-            switch (playerTurn)
+            switch (PlayerTurn)
             {
                 case 0:
                     player0Hand.Remove(cardValue);
@@ -343,7 +372,7 @@ public class GameManager : NetworkBehaviour
         }
         else
         {
-            playerList[playerTurn].TakeAction(actionNumber);
+            playerList[PlayerTurn].TakeAction(GameState);
         }
     }
 
@@ -352,13 +381,23 @@ public class GameManager : NetworkBehaviour
     {
         bool matchedSuit = false;
 
+        int discardPileCardSuit;
+
         int cardSuit = cardValue / 100;
 
-        int discardPileCardSuit = DiscardPileCardValue / 100;
+        if (SuitOverride == 0)
+        {
+            discardPileCardSuit = DiscardPileCardValue / 100; 
+        }
+        else
+        {
+            discardPileCardSuit = SuitOverride;
+        }
 
         if(cardSuit == discardPileCardSuit)
         {
             matchedSuit = true;
+            SuitOverride = 0;
         }
 
         return matchedSuit;
@@ -395,37 +434,109 @@ public class GameManager : NetworkBehaviour
     // If true calls for special actions to be performed 
     private int CheckSpecial(int cardValue)
     {
-        int actionNumber = 1;
+        GameState = 1;
 
         if ((cardValue % 100) == 7)
         {
-            actionNumber = 7;
+            GameState = 7;
         }
         else if ((cardValue % 100) == 8)
         {
-            actionNumber = 8;
+            GameState = 8;
+        }
+        else if ((cardValue % 100) == 4 && PlayerCount > 2)
+        {
+            GameState = 4;
+            Clockwise = !Clockwise;
         }
 
-        return actionNumber;
+        return GameState;
     }
 
-    ////temp
+    //Actions at end of turn
     public void ChangePlayerTurn()
     {
         if (isServer)
         {
-            if (playerTurn < playerList.Count - 1)
+
+            if (Clockwise)
             {
-                playerTurn++;
+                if (GameState!=8)
+                {
+                    if (PlayerTurn < PlayerCount - 1)
+                    {
+                        PlayerTurn++;
+                    }
+                    else PlayerTurn = 0;  
+                }
+                else
+                {
+                    if (PlayerTurn < PlayerCount - 2)
+                    {
+                        PlayerTurn = PlayerTurn + 2;
+                    }
+                    else if (PlayerTurn == PlayerCount - 2)
+                    {
+                        PlayerTurn = 0;
+                    }
+                    else if (PlayerTurn == PlayerCount - 1)
+                    {
+                        PlayerTurn = 1;
+                    }
+                }
             }
-            else playerTurn = 0;
+            else
+            {
+                if (GameState!=8)
+                {
+                    if (PlayerTurn > 0)
+                    {
+                        PlayerTurn--;
+                    }
+                    else PlayerTurn = PlayerCount - 1; 
+                }
+                else
+                {
+                    if (PlayerTurn > 1)
+                    {
+                        PlayerTurn = PlayerTurn - 2;
+                    }
+                    else if (PlayerTurn == 1)
+                    {
+                        PlayerTurn = PlayerCount - 1;
+                    }
+                    else if (PlayerTurn == 0)
+                    {
+                        PlayerTurn = PlayerCount - 2;
+                    }
+                }
+            }
+
+            if (GameState == 7)
+            {
+                playerList[PlayerTurn].RpcLockDown();
+                AvailableDrawCount = 2;
+                Draw2 = true;
+            }
+            else
+            {
+                GameState = 0;
+                AvailableDrawCount = 1;
+                playerList[PlayerTurn].RpcAllowCanDraw();
+            }
         }
     }
 
+    //Called when player draws a card
     public void DrawCard()
     {
         if (isServer)
         {
+            if (AvailableDrawCount <= 0)
+            {
+                return;
+            }
+
             int rNum = Random.Range(0, drawPile.Count);
 
             int card = drawPile[rNum];
@@ -438,10 +549,10 @@ public class GameManager : NetworkBehaviour
             }
 
             // set player turn so only that player can recive this card
-            playerList[playerTurn].AddCard(card);
+            playerList[PlayerTurn].AddCard(card);
 
             // Add cards to reference to each players hand
-            switch (playerTurn)
+            switch (PlayerTurn)
             {
                 case 0:
                     player0Hand.Add(card);
@@ -457,6 +568,18 @@ public class GameManager : NetworkBehaviour
                     break;
                 default:
                     break; 
+            }
+
+            AvailableDrawCount--;
+
+            if (Draw2 && AvailableDrawCount == 0)
+            {
+                Draw2 = false;
+                AvailableDrawCount = 1;
+                GameState = 0;
+                playerList[PlayerTurn].RpcUnlock();
+
+                ChangePlayerTurn();
             }
         }
     }
