@@ -583,4 +583,10 @@ public class GameManager : NetworkBehaviour
             }
         }
     }
+
+    public void ChooseSuit()
+    {
+        
+
+    }
 }
