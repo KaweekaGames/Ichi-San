@@ -163,7 +163,6 @@ public class Card : MonoBehaviour
         if (touched == false &&!MyPlayer.Locked)
         {
             touched = true;
-            //gameObject.ScaleTo(scaleFactor, scaleTime, 0);
         }
     }
 
@@ -172,7 +171,6 @@ public class Card : MonoBehaviour
         if (touched == true && !onDiscardPile)
         {
             touched = false;
-            //gameObject.ScaleTo(originalScale, scaleTime, 0f);
             gameObject.MoveTo(MyCardHolder.Location, constantMoveTime, delay, moveEase);
         }
     }
@@ -195,7 +193,6 @@ public class Card : MonoBehaviour
         if (touched == true && !onDiscardPile)
         {
             touched = false;
-            //gameObject.ScaleTo(originalScale, scaleTime, 0f);
             gameObject.MoveTo(MyCardHolder.Location, constantMoveTime, delay, moveEase); 
         }
     }

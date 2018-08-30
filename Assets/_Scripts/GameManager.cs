@@ -291,7 +291,7 @@ public class GameManager : NetworkBehaviour
     // These functions are called when a player attempts to play a card
     // *****
 
-    // Function returns true if card is a played leagally
+    // Set's GameState number and returns true if card is a played leagally
     public void CheckCard(int cardValue)
     {
         if (!isServer)
@@ -304,11 +304,12 @@ public class GameManager : NetworkBehaviour
         if (CheckJack(cardValue))
         {
             GameState = 11;
-
-            playerList[PlayerTurn].TakeAction(GameState);
+            AvailableDrawCount = 0;
 
             DiscardPileCardValue = cardValue;
             discardPile.Add(cardValue);
+
+            playerList[PlayerTurn].TakeAction(GameState);
 
             switch (PlayerTurn)
             {
@@ -328,8 +329,6 @@ public class GameManager : NetworkBehaviour
                     break;
             }
 
-            ChangePlayerTurn();
-
             return;
         }
 
@@ -343,6 +342,7 @@ public class GameManager : NetworkBehaviour
             GameState = CheckSpecial(cardValue);
         }
 
+        // If GameState is > 0 then a valid card has been played and should be removed from the player's hand.
         if (GameState>0)
         {
             playerList[PlayerTurn].TakeAction(GameState);
@@ -458,9 +458,9 @@ public class GameManager : NetworkBehaviour
     {
         if (isServer)
         {
-
             if (Clockwise)
             {
+                // If player played an 8 then skip next player
                 if (GameState!=8)
                 {
                     if (PlayerTurn < PlayerCount - 1)
@@ -487,6 +487,7 @@ public class GameManager : NetworkBehaviour
             }
             else
             {
+                // If player played an 8 then skip next player
                 if (GameState!=8)
                 {
                     if (PlayerTurn > 0)
@@ -512,6 +513,7 @@ public class GameManager : NetworkBehaviour
                 }
             }
 
+            // If player played a 7 then lock down next player until they draw 2 cards
             if (GameState == 7)
             {
                 playerList[PlayerTurn].RpcLockDown();
@@ -532,23 +534,27 @@ public class GameManager : NetworkBehaviour
     {
         if (isServer)
         {
+            // Return if Player is not allowed to draw any more this round
+            // Should not be called since player should not be able to call this function if they have already drawn a card
             if (AvailableDrawCount <= 0)
             {
                 return;
             }
 
-            int rNum = Random.Range(0, drawPile.Count);
-
-            int card = drawPile[rNum];
-
-            drawPile.RemoveAt(rNum);
+            // Select top card from the draw pile
+            int card = drawPile[0];
+            drawPile.RemoveAt(0);
 
             if (drawPile.Count <= 1)
             {
+                // Change sprite to blank so it when last card is drawn you can see that there are none left
                 DrawPileSpriteRenderer.sprite = DrawPileSprites[1];
+
+                // Possibly add this to CoRoutine with an animation
+                RefreshDrawPile();
             }
 
-            // set player turn so only that player can recive this card
+            // Add drawn card to player
             playerList[PlayerTurn].AddCard(card);
 
             // Add cards to reference to each players hand
@@ -570,6 +576,7 @@ public class GameManager : NetworkBehaviour
                     break; 
             }
 
+            // Reduce available draw count number so players can't draw too many cards
             AvailableDrawCount--;
 
             if (Draw2 && AvailableDrawCount == 0)
@@ -584,9 +591,12 @@ public class GameManager : NetworkBehaviour
         }
     }
 
-    public void ChooseSuit()
+    // Called by player after they place a Jack on the discard pile
+    // Sets the SuitOverride variable
+    public void SetSuit(int suit)
     {
-        
-
+        SuitOverride = suit;
+        GameState = 0;
+        ChangePlayerTurn();
     }
 }

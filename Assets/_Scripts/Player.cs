@@ -363,14 +363,19 @@ public class Player : NetworkBehaviour
             return;
         }
 
-        if (actionNumber == 0)
+        if (actionNumber > 0)
+        {
+            CheckedCard.ValidCard();
+
+            if (actionNumber == 11)
+            {
+                GetSuit();
+            }
+        }
+        else
         {
             CheckedCard.InValidCard();
             CheckedCard = null;
-        }
-        else if (actionNumber > 0)
-        {
-            CheckedCard.ValidCard();
         }
     }
 
@@ -473,5 +478,30 @@ public class Player : NetworkBehaviour
     public void RpcUnlock()
     {
         Locked = false;
+    }
+
+    void GetSuit()
+    {
+        //Enable Suit Selection Buttons
+    }
+
+    void SetSuit(int suit)
+    {
+        //Disable Suit Selection Buttions
+
+        if (isServer)
+        {
+            MyGm.SetSuit(suit); 
+        }
+        else
+        {
+            CmdSetSuit(suit);
+        }
+    }
+
+    [Command]
+    void CmdSetSuit(int suit)
+    {
+        MyGm.SetSuit(suit);
     }
 }
