@@ -64,8 +64,15 @@ public class Player : NetworkBehaviour
 
     // reference to cardHolder
     CardHolder cardHolderRef;
+
+    // UI buttons for Jack suit choice
+    //public Button SpadeButton;
+    //public Button ClubButton;
+    //public Button DiamondButton;
+    //public Button HeartButton;
+    public Button[] SuitButtons;
    
-    public bool ImReady = false;
+    bool ImReady = false;
 
     bool recievedMyInt = false;
 
@@ -92,6 +99,10 @@ public class Player : NetworkBehaviour
 
         MyGm = FindObjectOfType<GameManager>();
 
+        foreach (Button button in SuitButtons)
+        {
+            button.interactable = false;
+        }
         
     }
 
@@ -482,12 +493,22 @@ public class Player : NetworkBehaviour
 
     void GetSuit()
     {
-        //Enable Suit Selection Buttons
+        Debug.Log("getting suit"); 
+
+        foreach (Button button in SuitButtons)
+        {
+            button.interactable = true;
+        }
     }
 
-    void SetSuit(int suit)
+    public void SetSuit(int suit)
     {
-        //Disable Suit Selection Buttions
+        Debug.Log("setting suit");
+
+        foreach (Button button in SuitButtons)
+        {
+            button.interactable = false;
+        }
 
         if (isServer)
         {
