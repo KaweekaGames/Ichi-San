@@ -63,8 +63,6 @@ public class GameManager : NetworkBehaviour
 
     bool handDealt = false;
 
-    
-
     private void Start()
     {
         if (!isServer)
@@ -96,11 +94,6 @@ public class GameManager : NetworkBehaviour
             return;
         }
 
-        //if (handDealt && drawPile != null && drawPile.Count < 1)
-        //{
-        //    RefreshDrawPile();
-        //}
-
         if (playerList.Count < ExpectedPlayerCount)
         {
             GameObject[] newPlayers = GameObject.FindGameObjectsWithTag("Player");
@@ -117,6 +110,11 @@ public class GameManager : NetworkBehaviour
 
             ButtonText.text = playerList.Count.ToString();
         }
+
+        Player0CardsLeft = player0Hand.Count;
+        Player1CardsLeft = player1Hand.Count;
+        Player2CardsLeft = player2Hand.Count;
+        Player3CardsLeft = player3Hand.Count;
     }
 
     //temp button start

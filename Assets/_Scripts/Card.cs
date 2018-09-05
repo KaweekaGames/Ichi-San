@@ -104,7 +104,6 @@ public class Card : MonoBehaviour
     public void ReturnToHand()
     {
         gameObject.MoveTo(MyCardHolder.Location, constantMoveTime, delay, moveEase);
-        //gameObject.ScaleTo(originalScale, scaleTime, 0f);
     }
 
     // called by CardMarker child to parent card to  move to new position (bully card's old position) in player's hand
@@ -140,20 +139,22 @@ public class Card : MonoBehaviour
         }
 
         // called when player chosen card is placed onto the discard pile to check if it is a valid card
-        if (col.transform.tag == "DiscardPile")
+        if (col.transform.tag == "DiscardPile" && !onDiscardPile)
         {
+            onDiscardPile = true;
+
             if (MyPlayer.TurnCheck() && !MyPlayer.Locked)
             {
                 gameObject.MoveTo(col.transform.position, constantMoveTime, 0f, discardEase);
                 touched = false;
-                onDiscardPile = true;
-
+               
                 StartCoroutine("Wait");
             }
             else
             {
                 touched = false;
                 ReturnToHand();
+                onDiscardPile = false;
             }
         }
     }
@@ -207,6 +208,7 @@ public class Card : MonoBehaviour
     {
         MyCardHolder.Occupied = false;
         MyPlayer.RemoveCard(AssingedValue);
+        onDiscardPile = false;
         Destroy(gameObject);
     }
 

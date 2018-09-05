@@ -38,7 +38,7 @@ public class Player : NetworkBehaviour
     List<CardHolder> cardLocations;
 
     // current hand
-    List<int> myHand;
+    public List<int> MyHand;
 
     // reference to GameManager
     public GameManager MyGm;
@@ -57,7 +57,7 @@ public class Player : NetworkBehaviour
 
     // player name set at Lobby scene
     [SyncVar(hook = "GetMyName")]
-    public string myName = "nobody";
+    public string MyName = "nobody";
 
     // reference to checked card
     public Card CheckedCard;
@@ -66,13 +66,10 @@ public class Player : NetworkBehaviour
     CardHolder cardHolderRef;
 
     // UI buttons for Jack suit choice
-    //public Button SpadeButton;
-    //public Button ClubButton;
-    //public Button DiamondButton;
-    //public Button HeartButton;
+    public GameObject UISuitPanel;
     public Button[] SuitButtons;
    
-    bool ImReady = false;
+    public bool ImReady = false;
 
     bool recievedMyInt = false;
 
@@ -86,7 +83,7 @@ public class Player : NetworkBehaviour
 
     public override void OnStartClient()
     {
-        GetMyName(myName);
+        GetMyName(MyName);
 
         if (isLocalPlayer)
         {
@@ -95,14 +92,11 @@ public class Player : NetworkBehaviour
             LayoutHandArea();
         }
 
-        myHand = new List<int>();
+        MyHand = new List<int>();
 
         MyGm = FindObjectOfType<GameManager>();
 
-        foreach (Button button in SuitButtons)
-        {
-            button.interactable = false;
-        }
+        UISuitPanel.SetActive(false);
         
     }
 
@@ -160,8 +154,6 @@ public class Player : NetworkBehaviour
     // Build hand area
     void LayoutHandArea()
     {
-        Debug.Log("laying out hand");
-
         if (cardLocations == null)
         {
             cardLocations = new List<CardHolder>();
@@ -218,20 +210,20 @@ public class Player : NetworkBehaviour
             cardLocations.Add(ch);
         }
 
-        if (myHand == null)
+        if (MyHand == null)
         {
-            myHand = new List<int>();
+            MyHand = new List<int>();
         }
 
-        if (myHand.Count < 11)
+        if (MyHand.Count < 11)
         {
             xInterval = wideInterval;
         }
-        else if (myHand.Count >= 11 && myHand.Count < 16)
+        else if (MyHand.Count >= 11 && MyHand.Count < 16)
         {
             xInterval = mediuimInterval;
         }
-        else if (myHand.Count >=16 && myHand.Count <24)
+        else if (MyHand.Count >=16 && MyHand.Count <24)
         {
             xInterval = shortInterval;
         }
@@ -242,14 +234,14 @@ public class Player : NetworkBehaviour
 
         for (int i = 0; i < cardLocations.Count; i++)
         {
-            float xLocation = (float) (xInterval * (.5 * (myHand.Count - 1)));
+            float xLocation = (float) (xInterval * (.5 * (MyHand.Count - 1)));
 
             Vector3 location = new Vector3(-xLocation + i * xInterval, startingPoint.y, startingPoint.z + i * zInterval);
 
             cardLocations[i].Location = location;
             cardLocations[i].Index = i;
 
-            if (i<=myHand.Count)
+            if (i<=MyHand.Count)
             {
                 cardLocations[i].enabled = true;
             }
@@ -267,7 +259,7 @@ public class Player : NetworkBehaviour
     // Remove Card from hand
     public void RemoveCard(int cardValue)
     {
-        myHand.Remove(cardValue);
+        MyHand.Remove(cardValue);
         CheckedCard = null;
         FormatHand();
     }
@@ -321,7 +313,7 @@ public class Player : NetworkBehaviour
 
         card.MySpriteRenderer.sortingLayerName = cardHolderRef.SortingLayer;
 
-        myHand.Add(card.AssingedValue);
+        MyHand.Add(card.AssingedValue);
 
         FormatHand();
     }
@@ -433,7 +425,7 @@ public class Player : NetworkBehaviour
 
     public Vector3 FindLandingSpot()
     {
-        Vector3 landingSpot = cardLocations[myHand.Count].Location;
+        Vector3 landingSpot = cardLocations[MyHand.Count].Location;
 
         GameObject gO = Instantiate(DrawCardPrefab, drawPile.transform.position, Quaternion.identity);
         DrawCard drawCard = gO.GetComponent<DrawCard>();
@@ -493,22 +485,12 @@ public class Player : NetworkBehaviour
 
     void GetSuit()
     {
-        Debug.Log("getting suit"); 
-
-        foreach (Button button in SuitButtons)
-        {
-            button.interactable = true;
-        }
+        UISuitPanel.SetActive(true);
     }
 
     public void SetSuit(int suit)
     {
-        Debug.Log("setting suit");
-
-        foreach (Button button in SuitButtons)
-        {
-            button.interactable = false;
-        }
+        UISuitPanel.SetActive(false);
 
         if (isServer)
         {
@@ -524,5 +506,33 @@ public class Player : NetworkBehaviour
     void CmdSetSuit(int suit)
     {
         MyGm.SetSuit(suit);
+    }
+
+    public int ReturnNumberofPlayers()
+    {
+        int numPlayers = MyGm.PlayerCount;
+
+        return numPlayers;
+    }
+
+    public int ReturnNumberofCards(int playerNum)
+    {
+        switch (playerNum)
+        {
+            case 0:
+                return MyGm.Player0CardsLeft;
+
+            case 1:
+                return MyGm.Player1CardsLeft;
+
+            case 2:
+                return MyGm.Player2CardsLeft;
+
+            case 3:
+                return MyGm.Player3CardsLeft;
+
+            default:
+                return 999999;
+        }
     }
 }
