@@ -43,13 +43,15 @@ public class GameManager : NetworkBehaviour
 
     public Sprite[] DrawPileSprites;
 
-    public List<string> PlayerNames;
+    //public List<string> PlayerNames;
 
     public bool Clockwise = true;
 
     public bool Draw2 = false;
 
     public Text ButtonText;
+
+    DataCollector dataCollector;
 
     List<Player> playerList;
 
@@ -70,6 +72,9 @@ public class GameManager : NetworkBehaviour
     List<int>[] playerHands;
     List<int> playerScores;
 
+    List<string> savedPlayerNames;
+    List<int> savedPlayerScores;
+
     bool handDealt = false;
 
     private void Start()
@@ -79,9 +84,13 @@ public class GameManager : NetworkBehaviour
             return;
         }
 
+        // Find Network manager
         NetworkLobbyManager lobbyManager = FindObjectOfType<NetworkLobbyManager>();
-
+        // Find how many players were in the Lobby
         ExpectedPlayerCount = lobbyManager.numPlayers;
+
+        // Find data collector
+        dataCollector = FindObjectOfType<DataCollector>();
 
         // Initialize player hand reference
         playerHands = new List<int>[4];
@@ -107,6 +116,18 @@ public class GameManager : NetworkBehaviour
         playerList = new List<Player>();
         discardPile = new List<int>();
         drawPile = new List<int>();
+
+        // If loading a saved game update scores
+        if (dataCollector.LoadSavedGame)
+        {
+            savedPlayerNames = dataCollector.LoadNames();
+            savedPlayerScores = dataCollector.LoadScores();
+
+            for (int i = 0; i < savedPlayerScores.Count; i++)
+            {
+                playerScores[i] = savedPlayerScores[i];
+            }
+        }
     }
 
     void Update()
@@ -182,13 +203,17 @@ public class GameManager : NetworkBehaviour
 
         PlayerCount = playerList.Count;
 
-        string newName = player.name;
-
-        PlayerNames.Add(newName);
-
-        int playerNamesLength = PlayerNames.Count;
-
         player.MyGm = this;
+
+        // If loading a saved game assigned saved names
+        if (dataCollector.LoadSavedGame)
+        {
+            player.MyName = savedPlayerNames[player.MyInt];
+        }
+
+        //string newName = player.name;
+        //PlayerNames.Add(newName);
+        //int playerNamesLength = PlayerNames.Count;
     }
 
     // Linked to SyncVar, updates discharge pile card sprite
