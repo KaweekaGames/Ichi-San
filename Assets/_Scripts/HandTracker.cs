@@ -75,6 +75,9 @@ public class HandTracker : NetworkBehaviour
                 if (!players.Contains(playerScript))
                 {
                     players.Add(playerScript);
+
+                    int playerNum = playerScript.MyInt;
+                    PlayerScoreBoardNames[playerNum].text = playerScript.MyName;
                 }
             }
         }
@@ -105,12 +108,6 @@ public class HandTracker : NetworkBehaviour
                     PlayerCards[0].text = handCount.ToString();
                 }
             }
-
-            for (int i = 0; i < players.Count; i++)
-            {
-                PlayerScoreBoardNames[i].text = players[i].MyName;
-                PlayerScores[i].text = MyPlayer.ReturnScore(i).ToString();
-            }
         }
     }
 
@@ -130,5 +127,11 @@ public class HandTracker : NetworkBehaviour
         }
 
         players = tempList;
+    }
+
+    public void SetScore(int index, int score)
+    {
+        int updatedScore = score;
+        PlayerScores[index].text = score.ToString();
     }
 }

@@ -68,6 +68,9 @@ public class Player : NetworkBehaviour
     // UI buttons for Jack suit choice
     public GameObject UISuitPanel;
     public Button[] SuitButtons;
+
+    // Reference to ScoreBoard
+    public HandTracker HandTracker;
    
     public bool ImReady = false;
 
@@ -555,5 +558,39 @@ public class Player : NetworkBehaviour
             default:
                 return 999999;
         }
+    }
+
+    [ClientRpc]
+    public void RpcUpdateScore(int playerNumber)
+    {
+        //if (!isLocalPlayer)
+        //{
+        //    return;
+        //}
+
+        int updatedScore = 0;
+
+        switch (playerNumber)
+        {
+            case 0:
+                updatedScore = MyGm.Player0Score;
+                break;
+            case 1:
+                updatedScore = MyGm.Player1Score;
+                break;
+
+            case 2:
+                updatedScore = MyGm.Player2Score;
+                break;
+
+            case 3:
+                updatedScore = MyGm.Player3Score;
+                break;
+
+            default:
+                break;
+        }
+
+        HandTracker.SetScore(playerNumber, updatedScore);
     }
 }

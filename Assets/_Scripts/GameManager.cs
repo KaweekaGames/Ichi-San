@@ -648,18 +648,34 @@ public class GameManager : NetworkBehaviour
                     if (cardValue == 1)
                     {
                         playerScores[i] += multiplyer * 15;
+                        foreach (Player player in playerList)
+                        {
+                            player.RpcUpdateScore(i);
+                        }
                     }
                     else if (cardValue == 11)
                     {
                         playerScores[i] += multiplyer * 20;
+                        foreach (Player player in playerList)
+                        {
+                            player.RpcUpdateScore(i);
+                        }
                     }
                     else if (cardValue < 10)
                     {
                         playerScores[i] += multiplyer * 5;
+                        foreach (Player player in playerList)
+                        {
+                            player.RpcUpdateScore(i);
+                        }
                     }
                     else
                     {
                         playerScores[i] += multiplyer * 10;
+                        foreach (Player player in playerList)
+                        {
+                            player.RpcUpdateScore(i);
+                        }
                     }
                 } 
             }
