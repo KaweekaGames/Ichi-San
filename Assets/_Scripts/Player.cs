@@ -535,4 +535,25 @@ public class Player : NetworkBehaviour
                 return 999999;
         }
     }
+
+    public int ReturnScore(int playerNum)
+    {
+        switch (playerNum)
+        {
+            case 0:
+                return MyGm.Player0Score;
+
+            case 1:
+                return MyGm.Player1Score;
+
+            case 2:
+                return MyGm.Player2Score;
+
+            case 3:
+                return MyGm.Player3Score;
+
+            default:
+                return 999999;
+        }
+    }
 }

@@ -6,6 +6,13 @@ using Prototype.NetworkLobby;
 
 public class NetworkLobbyHook : LobbyHook
 {
+    DataCollector dataCollector;
+
+    private void Start()
+    {
+        dataCollector = FindObjectOfType<DataCollector>();
+    }
+
     public override void OnLobbyServerSceneLoadedForPlayer(NetworkManager manager, GameObject lobbyPlayer, GameObject gamePlayer)
     {
         //Default code below:

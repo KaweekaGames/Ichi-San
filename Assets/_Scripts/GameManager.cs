@@ -26,6 +26,14 @@ public class GameManager : NetworkBehaviour
     public int GameState = 0;
     [SyncVar(hook = "UpdateCanDraw")]
     public int AvailableDrawCount = 1;
+    [SyncVar]
+    public int Player0Score = 0;
+    [SyncVar]
+    public int Player1Score = 0;
+    [SyncVar]
+    public int Player2Score = 0;
+    [SyncVar]
+    public int Player3Score = 0;
 
     public int ExpectedPlayerCount;
 
@@ -60,6 +68,7 @@ public class GameManager : NetworkBehaviour
     List<int> player3Hand;
 
     List<int>[] playerHands;
+    List<int> playerScores;
 
     bool handDealt = false;
 
@@ -74,17 +83,30 @@ public class GameManager : NetworkBehaviour
 
         ExpectedPlayerCount = lobbyManager.numPlayers;
 
-        // Initialize lists
+        // Initialize player hand reference
+        playerHands = new List<int>[4];
+        playerScores = new List<int>();
+
         player0Hand = new List<int>();
+        playerHands[0] = player0Hand;
+        playerScores.Add(Player0Score);
+
         player1Hand = new List<int>();
+        playerHands[1] = player1Hand;
+        playerScores.Add(Player1Score);
+
         player2Hand = new List<int>();
+        playerHands[2] = player2Hand;
+        playerScores.Add(Player2Score);
+
         player3Hand = new List<int>();
+        playerHands[3] = player3Hand;
+        playerScores.Add(Player3Score);
 
         // Initialize lists
         playerList = new List<Player>();
         discardPile = new List<int>();
         drawPile = new List<int>();
-
     }
 
     void Update()
@@ -107,14 +129,30 @@ public class GameManager : NetworkBehaviour
                     AddPlayer(gO);
                 }
             }
-
-            ButtonText.text = playerList.Count.ToString();
         }
-
-        Player0CardsLeft = player0Hand.Count;
-        Player1CardsLeft = player1Hand.Count;
-        Player2CardsLeft = player2Hand.Count;
-        Player3CardsLeft = player3Hand.Count;
+        else
+        {
+            switch(playerHands.Length)
+            {
+                case 2:
+                    Player0CardsLeft = player0Hand.Count;
+                    Player1CardsLeft = player1Hand.Count;
+                    break;
+                case 3:
+                    Player0CardsLeft = player0Hand.Count;
+                    Player1CardsLeft = player1Hand.Count;
+                    Player2CardsLeft = player2Hand.Count;
+                    break;
+                case 4:
+                    Player0CardsLeft = player0Hand.Count;
+                    Player1CardsLeft = player1Hand.Count;
+                    Player2CardsLeft = player2Hand.Count;
+                    Player3CardsLeft = player3Hand.Count;
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     //temp button start
@@ -255,23 +293,7 @@ public class GameManager : NetworkBehaviour
                 playerList[j].AddCard(card);
 
                 // Add cards to reference to each players hand
-                switch (j)
-                {
-                    case 0:
-                        player0Hand.Add(card);
-                        break;
-                    case 1:
-                        player1Hand.Add(card);
-                        break;
-                    case 2:
-                        player2Hand.Add(card);
-                        break;
-                    case 3:
-                        player3Hand.Add(card);
-                        break;
-                    default:
-                        break;
-                }
+                AddCard(j, card);
             }
         }
 
@@ -307,25 +329,9 @@ public class GameManager : NetworkBehaviour
             DiscardPileCardValue = cardValue;
             discardPile.Add(cardValue);
 
-            playerList[PlayerTurn].TakeAction(GameState);
+            RemoveCard(PlayerTurn, cardValue);
 
-            switch (PlayerTurn)
-            {
-                case 0:
-                    player0Hand.Remove(cardValue);
-                    break;
-                case 1:
-                    player1Hand.Remove(cardValue);
-                    break;
-                case 2:
-                    player2Hand.Remove(cardValue);
-                    break;
-                case 3:
-                    player3Hand.Remove(cardValue);
-                    break;
-                default:
-                    break;
-            }
+            playerList[PlayerTurn].TakeAction(GameState);
 
             return;
         }
@@ -348,23 +354,7 @@ public class GameManager : NetworkBehaviour
             DiscardPileCardValue = cardValue;
             discardPile.Add(cardValue);
 
-            switch (PlayerTurn)
-            {
-                case 0:
-                    player0Hand.Remove(cardValue);
-                    break;
-                case 1:
-                    player1Hand.Remove(cardValue);
-                    break;
-                case 2:
-                    player2Hand.Remove(cardValue);
-                    break;
-                case 3:
-                    player3Hand.Remove(cardValue);
-                    break;
-                default:
-                    break;
-            }
+            RemoveCard(PlayerTurn, cardValue);
 
             ChangePlayerTurn();
         }
@@ -556,23 +546,7 @@ public class GameManager : NetworkBehaviour
             playerList[PlayerTurn].AddCard(card);
 
             // Add cards to reference to each players hand
-            switch (PlayerTurn)
-            {
-                case 0:
-                    player0Hand.Add(card);
-                    break;
-                case 1:
-                    player1Hand.Add(card);
-                    break;
-                case 2:
-                    player2Hand.Add(card);
-                    break;
-                case 3:
-                    player3Hand.Add(card);
-                    break;
-                default:
-                    break; 
-            }
+            AddCard(PlayerTurn, card);
 
             // Reduce available draw count number so players can't draw too many cards
             AvailableDrawCount--;
@@ -596,5 +570,99 @@ public class GameManager : NetworkBehaviour
         SuitOverride = suit;
         GameState = 0;
         ChangePlayerTurn();
+    }
+
+    // Add card to player hand reference
+    void RemoveCard(int index, int cardValue)
+    {
+        int winCheck = 1;
+
+        switch (index)
+        {
+            case 0:
+                player0Hand.Remove(cardValue);
+                winCheck = player0Hand.Count;
+                break;
+            case 1:
+                player1Hand.Remove(cardValue);
+                winCheck = player1Hand.Count;
+                break;
+            case 2:
+                player2Hand.Remove(cardValue);
+                winCheck = player2Hand.Count;
+                break;
+            case 3:
+                player3Hand.Remove(cardValue);
+                winCheck = player3Hand.Count;
+                break;
+            default:
+                break;
+        }
+
+        if (winCheck < 1)
+        {
+            RoundOver();
+        }
+    }
+
+    // Remove card to player hand reference
+    void AddCard(int index, int cardValue)
+    {
+        switch (index)
+        {
+            case 0:
+                player0Hand.Add(cardValue);
+                break;
+            case 1:
+                player1Hand.Add(cardValue);
+                break;
+            case 2:
+                player2Hand.Add(cardValue);
+                break;
+            case 3:
+                player3Hand.Add(cardValue);
+                break;
+            default:
+                break;
+        }
+    }
+
+    void RoundOver()
+    {
+        int multiplyer;
+
+        if (GameState == 11)
+        {
+            multiplyer = 2;
+        }
+        else multiplyer = 1;
+
+        for (int i = 0; i < playerList.Count; i++)
+        {
+            if (playerHands[i].Count > 0)
+            {
+                foreach (int card in playerHands[i])
+                {
+                    int cardValue = card % 100;
+
+                    if (cardValue == 1)
+                    {
+                        playerScores[i] += multiplyer * 15;
+                    }
+                    else if (cardValue == 11)
+                    {
+                        playerScores[i] += multiplyer * 20;
+                    }
+                    else if (cardValue < 10)
+                    {
+                        playerScores[i] += multiplyer * 5;
+                    }
+                    else
+                    {
+                        playerScores[i] += multiplyer * 10;
+                    }
+                } 
+            }
+        }
     }
 }

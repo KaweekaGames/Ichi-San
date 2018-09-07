@@ -11,6 +11,10 @@ public class HandTracker : NetworkBehaviour
     public TextMeshProUGUI[] PlayerName;
     public TextMeshProUGUI[] PlayerCards;
 
+    public GameObject ScoreBoardPanel;
+    public TextMeshProUGUI[] PlayerScoreBoardNames;
+    public TextMeshProUGUI[] PlayerScores;
+
     public Player MyPlayer;
 
     [SerializeField]
@@ -30,6 +34,8 @@ public class HandTracker : NetworkBehaviour
         }
 
         players = new List<Player>();
+
+        ScoreBoardPanel.SetActive(true);
     }
 
     // Update is called once per frame
@@ -98,6 +104,12 @@ public class HandTracker : NetworkBehaviour
                     int handCount = players[0].ReturnNumberofCards(0);
                     PlayerCards[0].text = handCount.ToString();
                 }
+            }
+
+            for (int i = 0; i < players.Count; i++)
+            {
+                PlayerScoreBoardNames[i].text = players[i].MyName;
+                PlayerScores[i].text = MyPlayer.ReturnScore(i).ToString();
             }
         }
     }
