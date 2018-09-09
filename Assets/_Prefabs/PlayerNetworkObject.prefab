@@ -1001,6 +1001,7 @@ MonoBehaviour:
   - {fileID: 114600189671173546}
   - {fileID: 114045608595109472}
   - {fileID: 114148794538847980}
+  HandTracker: {fileID: 114474637464342160}
   ImReady: 0
   DrawCardPrefab: {fileID: 1061550760158746, guid: 66ebcb9e22ce44a479e45d3486564dc3,
     type: 2}

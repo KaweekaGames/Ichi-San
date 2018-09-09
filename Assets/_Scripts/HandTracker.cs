@@ -60,8 +60,9 @@ public class HandTracker : NetworkBehaviour
         if (!initialized && openTimer <= 0)
         {
             numberOfPlayers = MyPlayer.ReturnNumberofPlayers();
-            players.Add(MyPlayer);
             ActivateUIObjects();
+            players.Add(MyPlayer);
+            PlayerScoreBoardNames[MyPlayer.MyInt].text = MyPlayer.MyName;
 
             initialized = true;
         }

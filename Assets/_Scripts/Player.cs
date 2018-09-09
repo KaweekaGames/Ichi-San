@@ -539,57 +539,15 @@ public class Player : NetworkBehaviour
         }
     }
 
-    public int ReturnScore(int playerNum)
-    {
-        switch (playerNum)
-        {
-            case 0:
-                return MyGm.Player0Score;
-
-            case 1:
-                return MyGm.Player1Score;
-
-            case 2:
-                return MyGm.Player2Score;
-
-            case 3:
-                return MyGm.Player3Score;
-
-            default:
-                return 999999;
-        }
-    }
-
     [ClientRpc]
-    public void RpcUpdateScore(int playerNumber)
+    public void RpcUpdateScore(int playerNumber, int updatedScore)
     {
-        //if (!isLocalPlayer)
-        //{
-        //    return;
-        //}
-
-        int updatedScore = 0;
-
-        switch (playerNumber)
+        if (!isLocalPlayer)
         {
-            case 0:
-                updatedScore = MyGm.Player0Score;
-                break;
-            case 1:
-                updatedScore = MyGm.Player1Score;
-                break;
-
-            case 2:
-                updatedScore = MyGm.Player2Score;
-                break;
-
-            case 3:
-                updatedScore = MyGm.Player3Score;
-                break;
-
-            default:
-                break;
+            return;
         }
+
+        Debug.Log("rpc score");
 
         HandTracker.SetScore(playerNumber, updatedScore);
     }

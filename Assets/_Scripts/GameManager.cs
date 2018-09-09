@@ -26,14 +26,11 @@ public class GameManager : NetworkBehaviour
     public int GameState = 0;
     [SyncVar(hook = "UpdateCanDraw")]
     public int AvailableDrawCount = 1;
-    [SyncVar]
-    public int Player0Score = 0;
-    [SyncVar]
-    public int Player1Score = 0;
-    [SyncVar]
-    public int Player2Score = 0;
-    [SyncVar]
-    public int Player3Score = 0;
+
+    PlayerScore Player0Score;
+    PlayerScore Player1Score;
+    PlayerScore Player2Score;
+    PlayerScore Player3Score;
 
     public int ExpectedPlayerCount;
 
@@ -70,7 +67,7 @@ public class GameManager : NetworkBehaviour
     List<int> player3Hand;
 
     List<int>[] playerHands;
-    List<int> playerScores;
+    List<PlayerScore> playerScores;
 
     List<string> savedPlayerNames;
     List<int> savedPlayerScores;
@@ -94,22 +91,26 @@ public class GameManager : NetworkBehaviour
 
         // Initialize player hand reference
         playerHands = new List<int>[4];
-        playerScores = new List<int>();
+        playerScores = new List<PlayerScore>();
 
         player0Hand = new List<int>();
         playerHands[0] = player0Hand;
+        Player0Score = new PlayerScore();
         playerScores.Add(Player0Score);
 
         player1Hand = new List<int>();
         playerHands[1] = player1Hand;
+        Player1Score = new PlayerScore();
         playerScores.Add(Player1Score);
 
         player2Hand = new List<int>();
         playerHands[2] = player2Hand;
+        Player2Score = new PlayerScore();
         playerScores.Add(Player2Score);
 
         player3Hand = new List<int>();
         playerHands[3] = player3Hand;
+        Player3Score = new PlayerScore();
         playerScores.Add(Player3Score);
 
         // Initialize lists
@@ -125,7 +126,7 @@ public class GameManager : NetworkBehaviour
 
             for (int i = 0; i < savedPlayerScores.Count; i++)
             {
-                playerScores[i] = savedPlayerScores[i];
+                playerScores[i].SetScore(savedPlayerScores[i]);
             }
         }
     }
@@ -672,34 +673,34 @@ public class GameManager : NetworkBehaviour
 
                     if (cardValue == 1)
                     {
-                        playerScores[i] += multiplyer * 15;
+                        playerScores[i].AddToScore(multiplyer * 15);
                         foreach (Player player in playerList)
                         {
-                            player.RpcUpdateScore(i);
+                            player.RpcUpdateScore(i, playerScores[i].Score);
                         }
                     }
                     else if (cardValue == 11)
                     {
-                        playerScores[i] += multiplyer * 20;
+                        playerScores[i].AddToScore(multiplyer * 20);
                         foreach (Player player in playerList)
                         {
-                            player.RpcUpdateScore(i);
+                            player.RpcUpdateScore(i, playerScores[i].Score);
                         }
                     }
                     else if (cardValue < 10)
                     {
-                        playerScores[i] += multiplyer * 5;
+                        playerScores[i].AddToScore(multiplyer * 5);
                         foreach (Player player in playerList)
                         {
-                            player.RpcUpdateScore(i);
+                            player.RpcUpdateScore(i, playerScores[i].Score);
                         }
                     }
                     else
                     {
-                        playerScores[i] += multiplyer * 10;
+                        playerScores[i].AddToScore(multiplyer * 10);
                         foreach (Player player in playerList)
                         {
-                            player.RpcUpdateScore(i);
+                            player.RpcUpdateScore(i, playerScores[i].Score);
                         }
                     }
                 } 
