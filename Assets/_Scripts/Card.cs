@@ -95,7 +95,9 @@ public class Card : MonoBehaviour
     // use to place on board
     public void SetPosition(Vector3 newLocation)
     {
-        transform.position = newLocation;
+        targetPos = newLocation;
+
+        transform.position = targetPos;
 
         originalScale = transform.localScale;
     }
@@ -189,12 +191,11 @@ public class Card : MonoBehaviour
         
     }
 
-    private void OnMouseExit()
+    void OnTouchMove(Vector2 point)
     {
-        if (touched == true && !onDiscardPile)
+        if (touched == true)
         {
-            touched = false;
-            gameObject.MoveTo(MyCardHolder.Location, constantMoveTime, delay, moveEase); 
+            targetPos = new Vector3(point.x, point.y, shiftedZPosition);
         }
     }
 
@@ -217,4 +218,17 @@ public class Card : MonoBehaviour
         yield return new WaitForSeconds(.4f);
         MyPlayer.CheckMyCard(this);
     }
+
+#if UNITY_EDITOR || UNITY_STANDALONE
+
+    private void OnMouseExit()
+    {
+        if (touched == true && !onDiscardPile)
+        {
+            touched = false;
+            gameObject.MoveTo(MyCardHolder.Location, constantMoveTime, delay, moveEase);
+        }
+    }
+
+#endif
 }
