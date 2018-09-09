@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerScore : MonoBehaviour
+public class PlayerScore
 {
-
     private int score = 0;
 
     public int Score { get { return score; } }

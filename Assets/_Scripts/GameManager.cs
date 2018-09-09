@@ -226,6 +226,11 @@ public class GameManager : NetworkBehaviour
     // Linked to SyncVar, updates if player can draw a card or not
     void UpdateCanDraw(int AvailableDrawCount)
     {
+        if (!isServer)
+        {
+            return;
+        }
+
         if (AvailableDrawCount <= 0)
         {
             foreach (Player player in playerList)

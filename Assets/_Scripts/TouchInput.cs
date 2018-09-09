@@ -23,7 +23,7 @@ public class TouchInput : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-//#if UNITY_EDITOR
+#if UNITY_EDITOR || UNITY_STANDALONE
 
         if (Input.GetMouseButton(0) || Input.GetMouseButtonDown(0) || Input.GetMouseButtonUp(0))
         {
@@ -68,46 +68,66 @@ public class TouchInput : MonoBehaviour
             }
         }
 
-//#endif
+#endif
 
-        //if (Input.touchCount > 0 )
-        //{
-        //    Touch touch = Input.GetTouch(0);
+        if (Input.touchCount > 0)
+        {
+            Touch touch = Input.GetTouch(0);
 
-        //    Vector2 worldPoint = theCamera.ScreenToWorldPoint(Input.mousePosition);
+            Vector2 worldPoint = theCamera.ScreenToWorldPoint(Input.mousePosition);
 
-        //    hit = Physics2D.Raycast(worldPoint, Vector2.zero, TouchInputMask);
+            //hit = Physics2D.Raycast(worldPoint, Vector2.zero, TouchInputMask);
 
-        //    if (hit)
-        //    {
-        //        GameObject recipient = hit.transform.gameObject;
+            //if (hit)
+            //{
 
-        //        if (touch.phase == TouchPhase.Began)
-        //        {
-        //            recipient.SendMessage("OnTouchDown", hit.point, SendMessageOptions.DontRequireReceiver);
-        //            Debug.Log("hello");
-        //        }
+            allHits = Physics2D.RaycastAll(worldPoint, Vector2.zero, TouchInputMask);
 
-        //        if (touch.phase == TouchPhase.Ended)
-        //        {
-        //            recipient.SendMessage("OnTouchUp", hit.point, SendMessageOptions.DontRequireReceiver);
-        //        }
+            if (allHits.Length > 0)
+            {
+                hit = allHits[0];
+                hitSpriteRenderer = hit.transform.GetComponent<SpriteRenderer>();
 
-        //        if (touch.phase == TouchPhase.Stationary)
-        //        {
-        //            recipient.SendMessage("OnTouchStay", hit.point, SendMessageOptions.DontRequireReceiver);
-        //        }
+                if (allHits.Length > 1)
+                {
+                    foreach (RaycastHit2D oneHit in allHits)
+                    {
+                        SpriteRenderer oneHitSpriteRenderer = oneHit.transform.GetComponent<SpriteRenderer>();
 
-        //        if (touch.phase == TouchPhase.Moved)
-        //        {
-        //            recipient.SendMessage("OnTouchMove", hit.point, SendMessageOptions.DontRequireReceiver);
-        //        }
+                        if (hitSpriteRenderer.sortingOrder < oneHitSpriteRenderer.sortingOrder)
+                        {
+                            hit = oneHit;
+                        }
+                    }
+                }
+                GameObject recipient = hit.transform.gameObject;
 
-        //        if (touch.phase == TouchPhase.Canceled)
-        //        {
-        //            recipient.SendMessage("OnTouchCancel", hit.point, SendMessageOptions.DontRequireReceiver);
-        //        }
-        //    }
-        //}
+                if (touch.phase == TouchPhase.Began)
+                {
+                    recipient.SendMessage("OnTouchDown", hit.point, SendMessageOptions.DontRequireReceiver);
+                    Debug.Log("hello");
+                }
+
+                if (touch.phase == TouchPhase.Ended)
+                {
+                    recipient.SendMessage("OnTouchUp", hit.point, SendMessageOptions.DontRequireReceiver);
+                }
+
+                if (touch.phase == TouchPhase.Stationary)
+                {
+                    recipient.SendMessage("OnTouchStay", hit.point, SendMessageOptions.DontRequireReceiver);
+                }
+
+                if (touch.phase == TouchPhase.Moved)
+                {
+                    recipient.SendMessage("OnTouchMove", hit.point, SendMessageOptions.DontRequireReceiver);
+                }
+
+                if (touch.phase == TouchPhase.Canceled)
+                {
+                    recipient.SendMessage("OnTouchCancel", hit.point, SendMessageOptions.DontRequireReceiver);
+                }
+            }
+        }
     }
 }

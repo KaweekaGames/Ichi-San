@@ -547,8 +547,6 @@ public class Player : NetworkBehaviour
             return;
         }
 
-        Debug.Log("rpc score");
-
         HandTracker.SetScore(playerNumber, updatedScore);
     }
 }
