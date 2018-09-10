@@ -32,11 +32,9 @@ public class Card : MonoBehaviour
     public EaseType moveEase;
     public EaseType snapEase;
     public EaseType discardEase;
-    public Vector3 scaleFactor;
     public bool onDiscardPile = false;
     public bool touched;
     Vector3 targetPos;
-    Vector3 originalScale;
 
     // sprites for cards
     [SerializeField]
@@ -98,8 +96,6 @@ public class Card : MonoBehaviour
         targetPos = newLocation;
 
         transform.position = targetPos;
-
-        originalScale = transform.localScale;
     }
 
     // called to move card back to player's hand

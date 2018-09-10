@@ -59,24 +59,31 @@ public class DrawCard : MonoBehaviour
         }
     }
 
+    void OnTouchMove(Vector2 point)
+    {
+        if (touched == true)
+        {
+            targetPos = new Vector3(point.x, point.y, shiftedZPosition);
+        }
+    }
+
     void OnTouchCancel()
     {
 
     }
-
-    private void OnMouseExit()
-    {
-        if (touched == true && !inHand)
-        {
-            touched = false;
-            gameObject.MoveTo(MyLocation, MoveTime, Delay, MoveEase);
-        }
-    }
-
+   
     // called to move card back to draw pile
     public void ReturnToPile()
     {
         gameObject.MoveTo(MyLocation, MoveTime, Delay, MoveEase);
+    }
+
+    // use to place on board
+    public void SetPosition(Vector3 newLocation)
+    {
+        targetPos = newLocation;
+
+        transform.position = targetPos;
     }
 
     // Actions when leaving Draw Pile
@@ -110,4 +117,17 @@ public class DrawCard : MonoBehaviour
         gameObject.transform.position = MyLocation;
         Destroy(gameObject);
     }
+
+#if UNITY_EDITOR || UNITY_STANDALONE
+
+    private void OnMouseExit()
+    {
+        if (touched == true && !inHand)
+        {
+            touched = false;
+            gameObject.MoveTo(MyLocation, MoveTime, Delay, MoveEase);
+        }
+    }
+
+#endif
 }

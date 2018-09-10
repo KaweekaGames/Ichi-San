@@ -119,6 +119,7 @@ public class Player : NetworkBehaviour
             {
                 GameObject gO = Instantiate(DrawCardPrefab, drawPile.transform.position, Quaternion.identity);
                 DrawCard drawCard = gO.GetComponent<DrawCard>();
+                drawCard.SetPosition(drawPile.transform.position);
 
                 drawCard.MyPlayer = this;
             }
