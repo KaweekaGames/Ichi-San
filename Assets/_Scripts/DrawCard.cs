@@ -69,7 +69,11 @@ public class DrawCard : MonoBehaviour
 
     void OnTouchCancel()
     {
-
+        if (touched == true && !inHand)
+        {
+            touched = false;
+            gameObject.MoveTo(MyLocation, MoveTime, Delay, MoveEase);
+        }
     }
    
     // called to move card back to draw pile
@@ -83,7 +87,10 @@ public class DrawCard : MonoBehaviour
     {
         targetPos = newLocation;
 
-        transform.position = targetPos;
+        MyLocation = targetPos;
+
+        transform.position = MyLocation;
+       
     }
 
     // Actions when leaving Draw Pile

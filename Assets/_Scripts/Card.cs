@@ -184,7 +184,11 @@ public class Card : MonoBehaviour
 
     void OnTouchCancel()
     {
-        
+        if (touched == true && !onDiscardPile)
+        {
+            touched = false;
+            gameObject.MoveTo(MyCardHolder.Location, constantMoveTime, delay, moveEase);
+        }
     }
 
     void OnTouchMove(Vector2 point)
