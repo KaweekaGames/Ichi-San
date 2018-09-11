@@ -87,20 +87,6 @@ public class Player : NetworkBehaviour
     public override void OnStartClient()
     {
         GetMyName(MyName);
-
-        if (isLocalPlayer)
-        {
-            cardLocations = new List<CardHolder>();
-
-            LayoutHandArea();
-        }
-
-        MyHand = new List<int>();
-
-        MyGm = FindObjectOfType<GameManager>();
-
-        UISuitPanel.SetActive(false);
-        
     }
 
     // Update is called once per frame
@@ -549,5 +535,42 @@ public class Player : NetworkBehaviour
         }
 
         HandTracker.SetScore(playerNumber, updatedScore);
+    }
+
+    [ClientRpc]
+    public void RpcClearHand()
+    {
+        if (!isLocalPlayer)
+        {
+            return;
+        }
+
+        MyHand.Clear();
+
+        GameObject[] allCards = GameObject.FindGameObjectsWithTag("Card");
+
+        foreach (GameObject gO in allCards)
+        {
+            Destroy(gO);
+        }
+
+        foreach (CardHolder ch in cardLocations)
+        {
+            ch.Occupied = false;
+        }
+
+        CanDraw = true;
+        Locked = false;
+    }
+
+    [ClientRpc]
+    public void RpcGetSuit()
+    {
+        if (!isLocalPlayer)
+        {
+            return;
+        }
+
+        GetSuit();
     }
 }

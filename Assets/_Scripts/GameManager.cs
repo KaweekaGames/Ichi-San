@@ -40,8 +40,6 @@ public class GameManager : NetworkBehaviour
 
     public Sprite[] DrawPileSprites;
 
-    //public List<string> PlayerNames;
-
     public bool Clockwise = true;
 
     public bool Draw2 = false;
@@ -73,6 +71,10 @@ public class GameManager : NetworkBehaviour
     List<int> savedPlayerScores;
 
     bool handDealt = false;
+    bool firstCard = true;
+
+    int playerStart = 0;
+
 
     private void Start()
     {
@@ -148,7 +150,7 @@ public class GameManager : NetworkBehaviour
 
                 if (!playerList.Contains(newPlayerScript))
                 {
-                    AddPlayer(gO);
+                    AddPlayer(newPlayerScript);
                 }
             }
         }
@@ -182,19 +184,23 @@ public class GameManager : NetworkBehaviour
     {
         if (isServer)
         {
-            DealCards(standardDeck); 
+            if (handDealt)
+            {
+                ResetValues();
+            }
+
+            DealCards(standardDeck);
+            CheckCard(DiscardPileCardValue);
         }
     }
 
     // Add player to list of players and assign their turn number (MyInt)
-    public void AddPlayer(GameObject newPlayer)
+    public void AddPlayer(Player player)
     {
         if (!isServer)
         {
             return;
         }
-
-        Player player = newPlayer.GetComponent<Player>();
 
         int nextPlayerNumber = playerList.Count;
 
@@ -211,10 +217,6 @@ public class GameManager : NetworkBehaviour
         {
             player.MyName = savedPlayerNames[player.MyInt];
         }
-
-        //string newName = player.name;
-        //PlayerNames.Add(newName);
-        //int playerNamesLength = PlayerNames.Count;
     }
 
     // Linked to SyncVar, updates discharge pile card sprite
@@ -354,6 +356,17 @@ public class GameManager : NetworkBehaviour
 
         if (CheckJack(cardValue))
         {
+            if (firstCard)
+            {
+                firstCard = false;
+                GameState = 11;
+                AvailableDrawCount = 0;
+
+                playerList[PlayerTurn].RpcGetSuit();
+
+                return;
+            }
+
             GameState = 11;
             AvailableDrawCount = 0;
 
@@ -377,7 +390,16 @@ public class GameManager : NetworkBehaviour
             GameState = CheckSpecial(cardValue);
         }
 
-        // If GameState is > 0 then a valid card has been played and should be removed from the player's hand.
+        // If GameState is > 0 then a valid card has been played and should be removed from the player's hand unless it is the first card after the deal, then return
+        if (firstCard)
+        {
+            firstCard = false;
+
+            ChangePlayerTurn();
+
+            return;
+        }
+
         if (GameState>0)
         {
             playerList[PlayerTurn].TakeAction(GameState);
@@ -710,6 +732,41 @@ public class GameManager : NetworkBehaviour
                     }
                 } 
             }
+        }
+    }
+
+    void ResetValues()
+    {
+        GameState = 0;
+
+        AvailableDrawCount = 1;
+
+        firstCard = true;
+
+        Draw2 = false;
+
+        if (playerStart < PlayerCount - 1)
+        {
+            playerStart++; 
+        }
+        else
+        {
+            playerStart = 0;
+        }
+
+        PlayerTurn = playerStart;
+
+        foreach (List<int> playerHand in playerHands)
+        {
+            if (playerHand.Count>0)
+            {
+                playerHand.Clear(); 
+            }
+        }
+
+        foreach (Player player in playerList)
+        {
+            player.RpcClearHand();
         }
     }
 }

@@ -122,13 +122,13 @@ public class HandTracker : NetworkBehaviour
             if (MyPlayer.MyInt == 0)
             {
                 PlayerName[0].text = players[1].MyName;
-                int handCount = players[1].ReturnNumberofCards(1);
+                int handCount = players[0].ReturnNumberofCards(1);
                 PlayerCards[0].text = handCount.ToString();
             }
             else
             {
                 PlayerName[0].text = players[0].MyName;
-                int handCount = players[0].ReturnNumberofCards(0);
+                int handCount = players[1].ReturnNumberofCards(0);
                 PlayerCards[0].text = handCount.ToString();
             }
         }
@@ -137,31 +137,31 @@ public class HandTracker : NetworkBehaviour
             if (MyPlayer.MyInt == 0)
             {
                 PlayerName[1].text = players[1].MyName;
-                int handCount = players[1].ReturnNumberofCards(1);
+                int handCount = players[0].ReturnNumberofCards(1);
                 PlayerCards[1].text = handCount.ToString();
 
                 PlayerName[2].text = players[2].MyName;
-                int handCount2 = players[2].ReturnNumberofCards(2);
+                int handCount2 = players[0].ReturnNumberofCards(2);
                 PlayerCards[2].text = handCount2.ToString();
             }
             else if (MyPlayer.MyInt == 1)
             {
                 PlayerName[1].text = players[2].MyName;
-                int handCount = players[2].ReturnNumberofCards(2);
+                int handCount = players[1].ReturnNumberofCards(2);
                 PlayerCards[1].text = handCount.ToString();
 
                 PlayerName[2].text = players[0].MyName;
-                int handCount2 = players[0].ReturnNumberofCards(0);
+                int handCount2 = players[1].ReturnNumberofCards(0);
                 PlayerCards[2].text = handCount2.ToString();
             }
             else if (MyPlayer.MyInt == 2)
             {
                 PlayerName[1].text = players[0].MyName;
-                int handCount = players[0].ReturnNumberofCards(0);
+                int handCount = players[2].ReturnNumberofCards(0);
                 PlayerCards[1].text = handCount.ToString();
 
                 PlayerName[2].text = players[1].MyName;
-                int handCount2 = players[1].ReturnNumberofCards(1);
+                int handCount2 = players[2].ReturnNumberofCards(1);
                 PlayerCards[2].text = handCount2.ToString();
             }
         }
@@ -170,57 +170,57 @@ public class HandTracker : NetworkBehaviour
             if (MyPlayer.MyInt == 0)
             {
                 PlayerName[0].text = players[2].MyName;
-                int handCount = players[2].ReturnNumberofCards(2);
+                int handCount = players[0].ReturnNumberofCards(2);
                 PlayerCards[0].text = handCount.ToString();
 
                 PlayerName[1].text = players[1].MyName;
-                int handCount1 = players[1].ReturnNumberofCards(1);
+                int handCount1 = players[0].ReturnNumberofCards(1);
                 PlayerCards[1].text = handCount1.ToString();
 
                 PlayerName[2].text = players[3].MyName;
-                int handCount2 = players[3].ReturnNumberofCards(3);
+                int handCount2 = players[0].ReturnNumberofCards(3);
                 PlayerCards[2].text = handCount2.ToString();
             }
             else if (MyPlayer.MyInt == 1)
             {
                 PlayerName[0].text = players[3].MyName;
-                int handCount = players[3].ReturnNumberofCards(3);
+                int handCount = players[1].ReturnNumberofCards(3);
                 PlayerCards[0].text = handCount.ToString();
 
                 PlayerName[1].text = players[2].MyName;
-                int handCount1 = players[2].ReturnNumberofCards(2);
+                int handCount1 = players[1].ReturnNumberofCards(2);
                 PlayerCards[1].text = handCount1.ToString();
 
                 PlayerName[2].text = players[0].MyName;
-                int handCount2 = players[0].ReturnNumberofCards(0);
+                int handCount2 = players[1].ReturnNumberofCards(0);
                 PlayerCards[2].text = handCount2.ToString();
             }
             else if (MyPlayer.MyInt == 2)
             {
                 PlayerName[0].text = players[0].MyName;
-                int handCount = players[0].ReturnNumberofCards(0);
+                int handCount = players[2].ReturnNumberofCards(0);
                 PlayerCards[0].text = handCount.ToString();
 
                 PlayerName[1].text = players[3].MyName;
-                int handCount1 = players[3].ReturnNumberofCards(3);
+                int handCount1 = players[2].ReturnNumberofCards(3);
                 PlayerCards[1].text = handCount1.ToString();
 
                 PlayerName[2].text = players[1].MyName;
-                int handCount2 = players[1].ReturnNumberofCards(1);
+                int handCount2 = players[2].ReturnNumberofCards(1);
                 PlayerCards[2].text = handCount2.ToString();
             }
             else if (MyPlayer.MyInt == 3)
             {
                 PlayerName[0].text = players[1].MyName;
-                int handCount = players[1].ReturnNumberofCards(1);
+                int handCount = players[3].ReturnNumberofCards(1);
                 PlayerCards[0].text = handCount.ToString();
 
                 PlayerName[1].text = players[0].MyName;
-                int handCount1 = players[0].ReturnNumberofCards(0);
+                int handCount1 = players[3].ReturnNumberofCards(0);
                 PlayerCards[1].text = handCount1.ToString();
 
                 PlayerName[2].text = players[2].MyName;
-                int handCount2 = players[2].ReturnNumberofCards(2);
+                int handCount2 = players[3].ReturnNumberofCards(2);
                 PlayerCards[2].text = handCount2.ToString();
             }
         }
