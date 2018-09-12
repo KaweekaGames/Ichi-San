@@ -119,7 +119,7 @@ public class DrawCard : MonoBehaviour
 
     IEnumerator Wait()
     {
-        yield return new WaitForSeconds(.4f);
+        yield return new WaitForSeconds(.6f);
         MyPlayer.DrawCard();
         gameObject.transform.position = MyLocation;
         Destroy(gameObject);

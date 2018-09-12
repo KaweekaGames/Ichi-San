@@ -191,6 +191,15 @@ public class Card : MonoBehaviour
         }
     }
 
+    private void OnMouseExit()
+    {
+        if (touched == true && !onDiscardPile)
+        {
+            touched = false;
+            gameObject.MoveTo(MyCardHolder.Location, constantMoveTime, delay, moveEase);
+        }
+    }
+
     void OnTouchMove(Vector2 point)
     {
         if (touched == true)
@@ -210,25 +219,18 @@ public class Card : MonoBehaviour
         MyCardHolder.Occupied = false;
         MyPlayer.RemoveCard(AssingedValue);
         onDiscardPile = false;
+        StartCoroutine("OnlyWait");
         Destroy(gameObject);
     }
 
     IEnumerator Wait()
     {
-        yield return new WaitForSeconds(.4f);
+        yield return new WaitForSeconds(.6f);
         MyPlayer.CheckMyCard(this);
     }
 
-#if UNITY_EDITOR || UNITY_STANDALONE
-
-    private void OnMouseExit()
+    IEnumerator OnlyWait()
     {
-        if (touched == true && !onDiscardPile)
-        {
-            touched = false;
-            gameObject.MoveTo(MyCardHolder.Location, constantMoveTime, delay, moveEase);
-        }
+        yield return new WaitForSeconds(.3f);
     }
-
-#endif
 }
