@@ -395,6 +395,11 @@ public class GameManager : NetworkBehaviour
         {
             firstCard = false;
 
+            if (GameState == 4)
+            {
+                Clockwise = !Clockwise;
+            }
+
             ChangePlayerTurn();
 
             return;
@@ -746,7 +751,7 @@ public class GameManager : NetworkBehaviour
         Draw2 = false;
 
         if (playerStart < PlayerCount - 1)
-        {
+        { 
             playerStart++; 
         }
         else

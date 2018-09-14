@@ -6,6 +6,8 @@ using UnityEngine.SceneManagement;
 
 public class DataCollector : MonoBehaviour
 {
+    public Text ButtonText;
+
     public bool LoadSavedGame = false;
 
     List<int> playerScores;
@@ -19,6 +21,10 @@ public class DataCollector : MonoBehaviour
     void Start()
     {
         DontDestroyOnLoad(gameObject);
+
+        string uniqueID = SystemInfo.deviceUniqueIdentifier;
+
+        ButtonText.text = uniqueID;
     }
 
     public void LoadLobby()
