@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class GameManager : NetworkBehaviour
 {
-    [SyncVar]
+    [SyncVar(hook = "SignalTurnIndicator")]
     public int PlayerTurn = 0;
     [SyncVar]
     public int PlayerCount = 0;
@@ -45,6 +45,8 @@ public class GameManager : NetworkBehaviour
     public bool Draw2 = false;
 
     public Text ButtonText;
+
+    public TurnIndicator TurnIndicator;
 
     DataCollector dataCollector;
 
@@ -137,6 +139,7 @@ public class GameManager : NetworkBehaviour
 
         // Set start timer
         startTimer = defaultStartTime;
+
     }
 
     void Update()
@@ -206,6 +209,10 @@ public class GameManager : NetworkBehaviour
 
             DealCards(standardDeck);
             CheckCard(DiscardPileCardValue);
+
+            TurnIndicator.NumberOfPlayers = ExpectedPlayerCount;
+            TurnIndicator.SpinDirection = 1;
+            TurnIndicator.ChangePlayer(PlayerTurn);
         }
     }
 
@@ -263,6 +270,23 @@ public class GameManager : NetworkBehaviour
             }
         }
     }
+
+    // Linked to SyncVar, updates if player turn changes.  Signals to Turn Indicator
+    void SignalTurnIndicator(int PlayerTurn)
+    {
+        if (Clockwise)
+        {
+            TurnIndicator.SpinDirection = 1;
+        }
+        else
+        {
+            TurnIndicator.SpinDirection = -1;
+        }
+
+        TurnIndicator.ChangePlayer(PlayerTurn);
+    }
+
+   
 
 
     // *****
