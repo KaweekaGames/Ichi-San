@@ -74,7 +74,10 @@ public class GameManager : NetworkBehaviour
     bool firstCard = true;
 
     int playerStart = 0;
+    float startTimer;
 
+    [SerializeField]
+    float defaultStartTime;
 
     private void Start()
     {
@@ -131,6 +134,9 @@ public class GameManager : NetworkBehaviour
                 playerScores[i].SetScore(savedPlayerScores[i]);
             }
         }
+
+        // Set start timer
+        startTimer = defaultStartTime;
     }
 
     void Update()
@@ -138,6 +144,15 @@ public class GameManager : NetworkBehaviour
         if (!isServer)
         { 
             return;
+        }
+
+        if (startTimer >0)
+        {
+            startTimer -= Time.deltaTime;
+        }
+        else if (startTimer <= 0 && !handDealt)
+        {
+            startRound();
         }
 
         if (playerList.Count < ExpectedPlayerCount)
@@ -689,9 +704,18 @@ public class GameManager : NetworkBehaviour
     {
         int multiplyer;
 
-        if (GameState == 11)
+        if (GameState == 11) // If last card is a jack add 2X multipier to scores
         {
             multiplyer = 2;
+        }
+        else if (GameState == 7) // If last card is a 7 then have next player draw 2 cards before adding up scores
+        {
+            GameState = 0;
+            ChangePlayerTurn();
+            AvailableDrawCount = 2;
+            DrawCard();
+            DrawCard();
+            multiplyer = 1;
         }
         else multiplyer = 1;
 
@@ -773,5 +797,7 @@ public class GameManager : NetworkBehaviour
         {
             player.RpcClearHand();
         }
+
+        startTimer = defaultStartTime;
     }
 }
