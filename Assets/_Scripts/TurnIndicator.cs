@@ -9,8 +9,9 @@ public class TurnIndicator : MonoBehaviour
     public Sprite[] IndicatorSprites3;
     public Sprite[] IndicatorSprites4;
 
-    public int SpinDirection = 1;
-    public int NumberOfPlayers = 2;
+    public GameManager MyGM;
+
+    int numberOfPlayers = 2;
 
     [SerializeField]
     float rotationSpeed;
@@ -22,6 +23,8 @@ public class TurnIndicator : MonoBehaviour
     float timer;
 
     float countDownTimer;
+    int currentTurn = 0;
+    int zRotation = 1;
 
     SpriteRenderer mySpriteRenderer;
 
@@ -34,22 +37,31 @@ public class TurnIndicator : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Spin(SpinDirection);
+        Spin();
     }
 
-    public void Spin(int zRotation)
+    public void Spin()
     {
+        zRotation = MyGM.Clockwise;
+        numberOfPlayers = MyGM.PlayerCount;
+
+        if (currentTurn != MyGM.PlayerTurn)
+        {
+            currentTurn = MyGM.PlayerTurn;
+            ChangeColor(currentTurn);
+        }
+
         Vector3 spinDirection = new Vector3(0, 0, zRotation);
         gameObject.RotateBy(spinDirection, rotationSpeed, rotationDelay, rotationEase);
     }
 
-    public void ChangePlayer(int playerNum)
+    public void ChangeColor(int playerNum)
     {
-        if (NumberOfPlayers == 2)
+        if (numberOfPlayers == 2)
         {
             mySpriteRenderer.sprite = IndicatorSprites2[playerNum];
         }
-        else if (NumberOfPlayers == 3)
+        else if (numberOfPlayers == 3)
         {
             mySpriteRenderer.sprite = IndicatorSprites3[playerNum];
         }
@@ -58,4 +70,6 @@ public class TurnIndicator : MonoBehaviour
             mySpriteRenderer.sprite = IndicatorSprites4[playerNum];
         }
     }
+
+
 }

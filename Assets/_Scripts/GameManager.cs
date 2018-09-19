@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class GameManager : NetworkBehaviour
 {
-    [SyncVar(hook = "SignalTurnIndicator")]
+    [SyncVar]
     public int PlayerTurn = 0;
     [SyncVar]
     public int PlayerCount = 0;
@@ -26,6 +26,8 @@ public class GameManager : NetworkBehaviour
     public int GameState = 0;
     [SyncVar(hook = "UpdateCanDraw")]
     public int AvailableDrawCount = 1;
+    [SyncVar]
+    public int Clockwise = 1;
 
     PlayerScore Player0Score;
     PlayerScore Player1Score;
@@ -40,13 +42,9 @@ public class GameManager : NetworkBehaviour
 
     public Sprite[] DrawPileSprites;
 
-    public bool Clockwise = true;
-
     public bool Draw2 = false;
 
     public Text ButtonText;
-
-    public TurnIndicator TurnIndicator;
 
     DataCollector dataCollector;
 
@@ -209,10 +207,6 @@ public class GameManager : NetworkBehaviour
 
             DealCards(standardDeck);
             CheckCard(DiscardPileCardValue);
-
-            TurnIndicator.NumberOfPlayers = ExpectedPlayerCount;
-            TurnIndicator.SpinDirection = 1;
-            TurnIndicator.ChangePlayer(PlayerTurn);
         }
     }
 
@@ -270,23 +264,6 @@ public class GameManager : NetworkBehaviour
             }
         }
     }
-
-    // Linked to SyncVar, updates if player turn changes.  Signals to Turn Indicator
-    void SignalTurnIndicator(int PlayerTurn)
-    {
-        if (Clockwise)
-        {
-            TurnIndicator.SpinDirection = 1;
-        }
-        else
-        {
-            TurnIndicator.SpinDirection = -1;
-        }
-
-        TurnIndicator.ChangePlayer(PlayerTurn);
-    }
-
-   
 
 
     // *****
@@ -436,7 +413,7 @@ public class GameManager : NetworkBehaviour
 
             if (GameState == 4)
             {
-                Clockwise = !Clockwise;
+                Clockwise = -1 * Clockwise;
             }
 
             ChangePlayerTurn();
@@ -532,7 +509,7 @@ public class GameManager : NetworkBehaviour
         else if ((cardValue % 100) == 4 && PlayerCount > 2)
         {
             GameState = 4;
-            Clockwise = !Clockwise;
+            Clockwise = -1 * Clockwise;
         }
 
         return GameState;
@@ -543,7 +520,7 @@ public class GameManager : NetworkBehaviour
     {
         if (isServer)
         {
-            if (Clockwise)
+            if (Clockwise == 1)
             {
                 // If player played an 8 then skip next player
                 if (GameState!=8)
