@@ -9,6 +9,7 @@ TagManager:
   - Unkown
   - Card
   - CardMarker
+  - HandArea
   layers:
   - Default
   - TransparentFX

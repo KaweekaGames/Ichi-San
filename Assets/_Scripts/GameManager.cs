@@ -27,7 +27,7 @@ public class GameManager : NetworkBehaviour
     [SyncVar(hook = "UpdateCanDraw")]
     public int AvailableDrawCount = 1;
     [SyncVar]
-    public int Clockwise = 1;
+    public int Clockwise = -1;
 
     PlayerScore Player0Score;
     PlayerScore Player1Score;
@@ -520,7 +520,7 @@ public class GameManager : NetworkBehaviour
     {
         if (isServer)
         {
-            if (Clockwise == 1)
+            if (Clockwise == -1)
             {
                 // If player played an 8 then skip next player
                 if (GameState!=8)
@@ -633,6 +633,10 @@ public class GameManager : NetworkBehaviour
                 playerList[PlayerTurn].RpcUnlock();
 
                 ChangePlayerTurn();
+            }
+            else
+            {
+                playerList[PlayerTurn].RpcStartCountdown();
             }
         }
     }
@@ -774,6 +778,8 @@ public class GameManager : NetworkBehaviour
         firstCard = true;
 
         Draw2 = false;
+
+        Clockwise = -1;
 
         if (playerStart < PlayerCount - 1)
         { 

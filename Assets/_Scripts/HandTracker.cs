@@ -15,10 +15,15 @@ public class HandTracker : NetworkBehaviour
     public TextMeshProUGUI[] PlayerScoreBoardNames;
     public TextMeshProUGUI[] PlayerScores;
 
+    GameObject playerHandArea;
+    SpriteRenderer pHASpriteRenderer;
+
     public Player MyPlayer;
 
     [SerializeField]
     float openTimer = 2f;
+    [SerializeField]
+    Color[] PlayerColors;
 
     int numberOfPlayers;
     List<Player> players;
@@ -35,7 +40,7 @@ public class HandTracker : NetworkBehaviour
 
         players = new List<Player>();
 
-        ScoreBoardPanel.SetActive(true);
+        ScoreBoardPanel.SetActive(false);
 
         // Set to inActive as default so we don't need this code!!!
         foreach (GameObject gO in PlayerPanel)
@@ -63,6 +68,10 @@ public class HandTracker : NetworkBehaviour
             ActivateUIObjects();
             players.Add(MyPlayer);
             PlayerScoreBoardNames[MyPlayer.MyInt].text = MyPlayer.MyName;
+
+            playerHandArea = GameObject.FindGameObjectWithTag("HandArea");
+            pHASpriteRenderer = playerHandArea.GetComponent<SpriteRenderer>();
+            pHASpriteRenderer.color = PlayerColors[MyPlayer.MyInt];
 
             initialized = true;
         }

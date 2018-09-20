@@ -573,4 +573,21 @@ public class Player : NetworkBehaviour
 
         GetSuit();
     }
+
+    [ClientRpc]
+    public void RpcStartCountdown()
+    {
+        if (!isLocalPlayer)
+        {
+            return;
+        }
+
+        StartCoroutine("Wait");
+    }
+
+    IEnumerator Wait()
+    {
+        yield return new WaitForSeconds(5f);
+        EndMyTurn();
+    }
 }

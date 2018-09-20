@@ -9,6 +9,8 @@ public class TurnIndicator : MonoBehaviour
     public Sprite[] IndicatorSprites3;
     public Sprite[] IndicatorSprites4;
 
+    public Color[] TurnColors;
+
     public GameManager MyGM;
 
     int numberOfPlayers = 2;
@@ -24,7 +26,7 @@ public class TurnIndicator : MonoBehaviour
 
     float countDownTimer;
     int currentTurn = 0;
-    int zRotation = 1;
+    int zRotation = -1;
 
     SpriteRenderer mySpriteRenderer;
 
@@ -57,18 +59,7 @@ public class TurnIndicator : MonoBehaviour
 
     public void ChangeColor(int playerNum)
     {
-        if (numberOfPlayers == 2)
-        {
-            mySpriteRenderer.sprite = IndicatorSprites2[playerNum];
-        }
-        else if (numberOfPlayers == 3)
-        {
-            mySpriteRenderer.sprite = IndicatorSprites3[playerNum];
-        }
-        else
-        {
-            mySpriteRenderer.sprite = IndicatorSprites4[playerNum];
-        }
+        gameObject.ColorTo(TurnColors[playerNum], .5f, 0);
     }
 
 
