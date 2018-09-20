@@ -20,6 +20,11 @@ public class HandTracker : NetworkBehaviour
 
     public Player MyPlayer;
 
+    Image panelImage0;
+    Image panelImage1;
+    Image panelImage2;
+    Image panelImage3;
+
     [SerializeField]
     float openTimer = 2f;
     [SerializeField]
@@ -42,11 +47,12 @@ public class HandTracker : NetworkBehaviour
 
         ScoreBoardPanel.SetActive(false);
 
-        // Set to inActive as default so we don't need this code!!!
-        foreach (GameObject gO in PlayerPanel)
-        {
-            gO.SetActive(false);
-        }
+        // Get Panel Sprites/Image reference for color change
+        panelImage0 = PlayerPanel[0].GetComponent<Image>();
+        panelImage1 = PlayerPanel[1].GetComponent<Image>();
+        panelImage2 = PlayerPanel[2].GetComponent<Image>();
+        panelImage3 = PlayerPanel[3].GetComponent<Image>();
+
     }
 
     // Update is called once per frame
@@ -133,12 +139,16 @@ public class HandTracker : NetworkBehaviour
                 PlayerName[0].text = players[1].MyName;
                 int handCount = players[0].ReturnNumberofCards(1);
                 PlayerCards[0].text = handCount.ToString();
+                PlayerCards[0].color = PlayerColors[1];
+                panelImage0.color = PlayerColors[1];
             }
             else
             {
                 PlayerName[0].text = players[0].MyName;
                 int handCount = players[1].ReturnNumberofCards(0);
                 PlayerCards[0].text = handCount.ToString();
+                PlayerCards[0].color = PlayerColors[0];
+                panelImage0.color = PlayerColors[0];
             }
         }
         else if (numberOfPlayers == 3)
@@ -148,30 +158,42 @@ public class HandTracker : NetworkBehaviour
                 PlayerName[1].text = players[1].MyName;
                 int handCount = players[0].ReturnNumberofCards(1);
                 PlayerCards[1].text = handCount.ToString();
+                PlayerCards[1].color = PlayerColors[1];
+                panelImage1.color = PlayerColors[1];
 
                 PlayerName[2].text = players[2].MyName;
                 int handCount2 = players[0].ReturnNumberofCards(2);
                 PlayerCards[2].text = handCount2.ToString();
+                PlayerCards[2].color = PlayerColors[2];
+                panelImage2.color = PlayerColors[2];
             }
             else if (MyPlayer.MyInt == 1)
             {
                 PlayerName[1].text = players[2].MyName;
                 int handCount = players[1].ReturnNumberofCards(2);
                 PlayerCards[1].text = handCount.ToString();
+                PlayerCards[1].color = PlayerColors[2];
+                panelImage1.color = PlayerColors[2];
 
                 PlayerName[2].text = players[0].MyName;
                 int handCount2 = players[1].ReturnNumberofCards(0);
                 PlayerCards[2].text = handCount2.ToString();
+                PlayerCards[2].color = PlayerColors[0];
+                panelImage2.color = PlayerColors[0];
             }
             else if (MyPlayer.MyInt == 2)
             {
                 PlayerName[1].text = players[0].MyName;
                 int handCount = players[2].ReturnNumberofCards(0);
                 PlayerCards[1].text = handCount.ToString();
+                PlayerCards[1].color = PlayerColors[0];
+                panelImage1.color = PlayerColors[0];
 
                 PlayerName[2].text = players[1].MyName;
                 int handCount2 = players[2].ReturnNumberofCards(1);
                 PlayerCards[2].text = handCount2.ToString();
+                PlayerCards[2].color = PlayerColors[1];
+                panelImage2.color = PlayerColors[1];
             }
         }
         else if (numberOfPlayers == 4)
@@ -181,56 +203,80 @@ public class HandTracker : NetworkBehaviour
                 PlayerName[0].text = players[2].MyName;
                 int handCount = players[0].ReturnNumberofCards(2);
                 PlayerCards[0].text = handCount.ToString();
+                PlayerCards[0].color = PlayerColors[2];
+                panelImage0.color = PlayerColors[2];
 
                 PlayerName[1].text = players[1].MyName;
                 int handCount1 = players[0].ReturnNumberofCards(1);
                 PlayerCards[1].text = handCount1.ToString();
+                PlayerCards[1].color = PlayerColors[1];
+                panelImage1.color = PlayerColors[1];
 
                 PlayerName[2].text = players[3].MyName;
                 int handCount2 = players[0].ReturnNumberofCards(3);
                 PlayerCards[2].text = handCount2.ToString();
+                PlayerCards[2].color = PlayerColors[3];
+                panelImage2.color = PlayerColors[3];
             }
             else if (MyPlayer.MyInt == 1)
             {
                 PlayerName[0].text = players[3].MyName;
                 int handCount = players[1].ReturnNumberofCards(3);
                 PlayerCards[0].text = handCount.ToString();
+                PlayerCards[0].color = PlayerColors[3];
+                panelImage0.color = PlayerColors[3];
 
                 PlayerName[1].text = players[2].MyName;
                 int handCount1 = players[1].ReturnNumberofCards(2);
                 PlayerCards[1].text = handCount1.ToString();
+                PlayerCards[1].color = PlayerColors[2];
+                panelImage1.color = PlayerColors[2];
 
                 PlayerName[2].text = players[0].MyName;
                 int handCount2 = players[1].ReturnNumberofCards(0);
                 PlayerCards[2].text = handCount2.ToString();
+                PlayerCards[2].color = PlayerColors[0];
+                panelImage2.color = PlayerColors[0];
             }
             else if (MyPlayer.MyInt == 2)
             {
                 PlayerName[0].text = players[0].MyName;
                 int handCount = players[2].ReturnNumberofCards(0);
                 PlayerCards[0].text = handCount.ToString();
+                PlayerCards[0].color = PlayerColors[0];
+                panelImage0.color = PlayerColors[0];
 
                 PlayerName[1].text = players[3].MyName;
                 int handCount1 = players[2].ReturnNumberofCards(3);
                 PlayerCards[1].text = handCount1.ToString();
+                PlayerCards[1].color = PlayerColors[3];
+                panelImage1.color = PlayerColors[3];
 
                 PlayerName[2].text = players[1].MyName;
                 int handCount2 = players[2].ReturnNumberofCards(1);
                 PlayerCards[2].text = handCount2.ToString();
+                PlayerCards[2].color = PlayerColors[1];
+                panelImage2.color = PlayerColors[1];
             }
             else if (MyPlayer.MyInt == 3)
             {
                 PlayerName[0].text = players[1].MyName;
                 int handCount = players[3].ReturnNumberofCards(1);
                 PlayerCards[0].text = handCount.ToString();
+                PlayerCards[0].color = PlayerColors[1];
+                panelImage0.color = PlayerColors[1];
 
                 PlayerName[1].text = players[0].MyName;
                 int handCount1 = players[3].ReturnNumberofCards(0);
                 PlayerCards[1].text = handCount1.ToString();
+                PlayerCards[1].color = PlayerColors[0];
+                panelImage1.color = PlayerColors[0];
 
                 PlayerName[2].text = players[2].MyName;
                 int handCount2 = players[3].ReturnNumberofCards(2);
                 PlayerCards[2].text = handCount2.ToString();
+                PlayerCards[2].color = PlayerColors[2];
+                panelImage2.color = PlayerColors[2];
             }
         }
     }
