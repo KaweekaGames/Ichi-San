@@ -61,7 +61,7 @@ public class HandTracker : NetworkBehaviour
             return;
         }
 
-        if (!initialized && MyPlayer.ReturnGMReadyState() == 1)
+        if (!initialized && MyPlayer.GMReady == 1)
         {
             numberOfPlayers = MyPlayer.ReturnNumberofPlayers();
             ActivateUIObjects();

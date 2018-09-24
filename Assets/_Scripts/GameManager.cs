@@ -49,8 +49,6 @@ public class GameManager : NetworkBehaviour
     // Remove this
     public Text ButtonText;
 
-    public GameObject WelcomePanel;
-
     DataCollector dataCollector;
 
     List<Player> playerList;
@@ -170,9 +168,12 @@ public class GameManager : NetworkBehaviour
         {
             ReadyToStart = 1;
 
-            playerList[PlayerTurn].RpcActivateDealButton();
+            foreach (Player player in playerList)
+            {
+                player.GMReady = 1;
+            }
 
-            WelcomePanel.SetActive(false);
+            playerList[PlayerTurn].RpcActivateDealButton();
         }
 
         if(ReadyToStart == 1 && handDealt)

@@ -59,6 +59,9 @@ public class Player : NetworkBehaviour
     [SyncVar(hook = "GetMyName")]
     public string MyName = "nobody";
 
+    [SyncVar]
+    public int GMReady = 0;
+
     // reference to checked card
     public Card CheckedCard;
 
@@ -529,13 +532,6 @@ public class Player : NetworkBehaviour
             default:
                 return 999999;
         }
-    }
-
-    public int ReturnGMReadyState()
-    {
-        int readyState = MyGm.ReadyToStart;
-
-        return readyState;
     }
 
     [ClientRpc]
