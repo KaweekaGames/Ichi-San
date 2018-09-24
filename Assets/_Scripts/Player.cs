@@ -90,6 +90,8 @@ public class Player : NetworkBehaviour
     public override void OnStartClient()
     {
         GetMyName(MyName);
+
+        DealButton.interactable = false;
     }
 
     // Update is called once per frame
@@ -598,7 +600,7 @@ public class Player : NetworkBehaviour
         if (isServer)
         {
             MyGm.StartRound();
-            DealButton.enabled = false;
+            DeactivateDealButton();
         }
         else
         {
@@ -609,12 +611,18 @@ public class Player : NetworkBehaviour
     [Command]
     void CmdDealCards()
     {
-        DealCards();
+        MyGm.StartRound();
+        
     }
 
     void ActivateDealButton()
     {
-        DealButton.enabled = true;
+        DealButton.interactable = true;
+    }
+
+    void DeactivateDealButton()
+    {
+        DealButton.interactable = false;
     }
 
     [ClientRpc]
@@ -626,6 +634,17 @@ public class Player : NetworkBehaviour
         }
 
        ActivateDealButton();
+    }
+
+    [ClientRpc]
+    public void RpcDeactivateDealButton()
+    {
+        if (!isLocalPlayer)
+        {
+            return;
+        }
+
+        DeactivateDealButton();
     }
 
     IEnumerator Wait()
