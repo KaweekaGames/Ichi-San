@@ -28,6 +28,8 @@ public class GameManager : NetworkBehaviour
     public int AvailableDrawCount = 1;
     [SyncVar]
     public int Clockwise = -1;
+    [SyncVar]
+    public int ReadyToStart = 0;
 
     PlayerScore Player0Score;
     PlayerScore Player1Score;
@@ -44,7 +46,10 @@ public class GameManager : NetworkBehaviour
 
     public bool Draw2 = false;
 
+    // Remove this
     public Text ButtonText;
+
+    public GameObject WelcomePanel;
 
     DataCollector dataCollector;
 
@@ -147,15 +152,6 @@ public class GameManager : NetworkBehaviour
             return;
         }
 
-        if (startTimer >0)
-        {
-            startTimer -= Time.deltaTime;
-        }
-        else if (startTimer <= 0 && !handDealt)
-        {
-            StartRound();
-        }
-
         if (playerList.Count < ExpectedPlayerCount)
         {
             GameObject[] newPlayers = GameObject.FindGameObjectsWithTag("Player");
@@ -170,8 +166,18 @@ public class GameManager : NetworkBehaviour
                 }
             }
         }
-        else
+        else if (ReadyToStart == 0)
         {
+            ReadyToStart = 1;
+
+            playerList[PlayerTurn].RpcActivateDealButton();
+
+            WelcomePanel.SetActive(false);
+        }
+
+        if(ReadyToStart == 1 && handDealt)
+        {
+            // Keep playerXCardsLeft values updated
             switch(playerHands.Length)
             {
                 case 2:

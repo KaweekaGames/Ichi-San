@@ -531,6 +531,13 @@ public class Player : NetworkBehaviour
         }
     }
 
+    public int ReturnGMReadyState()
+    {
+        int readyState = MyGm.ReadyToStart;
+
+        return readyState;
+    }
+
     [ClientRpc]
     public void RpcUpdateScore(int playerNumber, int updatedScore)
     {
@@ -605,6 +612,7 @@ public class Player : NetworkBehaviour
         else
         {
             CmdDealCards();
+            DeactivateDealButton();
         }
     }
 

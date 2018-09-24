@@ -40,7 +40,7 @@ public class TurnIndicator : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (MyGM.ExpectedPlayerCount == MyGM.PlayerCount)
+        if (!goSpin && MyGM.ExpectedPlayerCount == MyGM.PlayerCount)
         {
             goSpin = true;
             ChangeColor(MyGM.PlayerTurn);

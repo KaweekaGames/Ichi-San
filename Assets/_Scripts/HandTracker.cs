@@ -26,8 +26,6 @@ public class HandTracker : NetworkBehaviour
     Image panelImage3;
 
     [SerializeField]
-    float openTimer = 2f;
-    [SerializeField]
     Color[] PlayerColors;
 
     int numberOfPlayers;
@@ -63,12 +61,7 @@ public class HandTracker : NetworkBehaviour
             return;
         }
 
-        if (openTimer >0)
-        {
-            openTimer -= Time.deltaTime; 
-        }
-
-        if (!initialized && openTimer <= 0)
+        if (!initialized && MyPlayer.ReturnGMReadyState() == 1)
         {
             numberOfPlayers = MyPlayer.ReturnNumberofPlayers();
             ActivateUIObjects();
