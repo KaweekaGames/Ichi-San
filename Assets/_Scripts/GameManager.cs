@@ -153,7 +153,7 @@ public class GameManager : NetworkBehaviour
         }
         else if (startTimer <= 0 && !handDealt)
         {
-            startRound();
+            StartRound();
         }
 
         if (playerList.Count < ExpectedPlayerCount)
@@ -196,7 +196,7 @@ public class GameManager : NetworkBehaviour
     }
 
     //temp button start
-    public void startRound()
+    public void StartRound()
     {
         if (isServer)
         {
@@ -774,6 +774,20 @@ public class GameManager : NetworkBehaviour
                 } 
             }
         }
+
+        // Activate Deal Button on player who is next dealer
+        if (playerStart < PlayerCount - 1)
+        {
+            playerStart++;
+        }
+        else
+        {
+            playerStart = 0;
+        }
+
+        PlayerTurn = playerStart;
+
+        playerList[PlayerTurn].RpcActivateDealButton();
     }
 
     void ResetValues()
@@ -790,17 +804,6 @@ public class GameManager : NetworkBehaviour
 
         SuitOverride = 0;
 
-        if (playerStart < PlayerCount - 1)
-        { 
-            playerStart++; 
-        }
-        else
-        {
-            playerStart = 0;
-        }
-
-        PlayerTurn = playerStart;
-
         foreach (List<int> playerHand in playerHands)
         {
             if (playerHand.Count>0)
@@ -816,4 +819,6 @@ public class GameManager : NetworkBehaviour
 
         startTimer = defaultStartTime;
     }
+
+
 }

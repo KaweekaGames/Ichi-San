@@ -69,9 +69,12 @@ public class Player : NetworkBehaviour
     public GameObject UISuitPanel;
     public Button[] SuitButtons;
 
+    // UI button for dealing cards
+    public Button DealButton;
+
     // Reference to ScoreBoard
     public HandTracker HandTracker;
-   
+
     public bool ImReady = false;
 
     bool recievedMyInt = false;
@@ -213,7 +216,7 @@ public class Player : NetworkBehaviour
         {
             xInterval = mediuimInterval;
         }
-        else if (MyHand.Count >=16 && MyHand.Count <24)
+        else if (MyHand.Count >= 16 && MyHand.Count < 24)
         {
             xInterval = shortInterval;
         }
@@ -224,14 +227,14 @@ public class Player : NetworkBehaviour
 
         for (int i = 0; i < cardLocations.Count; i++)
         {
-            float xLocation = (float) (xInterval * (.5 * (MyHand.Count - 1)));
+            float xLocation = (float)(xInterval * (.5 * (MyHand.Count - 1)));
 
             Vector3 location = new Vector3(-xLocation + i * xInterval, startingPoint.y, startingPoint.z + i * zInterval);
 
             cardLocations[i].Location = location;
             cardLocations[i].Index = i;
 
-            if (i<=MyHand.Count)
+            if (i <= MyHand.Count)
             {
                 cardLocations[i].enabled = true;
             }
@@ -484,7 +487,7 @@ public class Player : NetworkBehaviour
 
         if (isServer)
         {
-            MyGm.SetSuit(suit); 
+            MyGm.SetSuit(suit);
         }
         else
         {
@@ -583,6 +586,46 @@ public class Player : NetworkBehaviour
         }
 
         StartCoroutine("Wait");
+    }
+
+    public void DealCards()
+    {
+        if (!isLocalPlayer)
+        {
+            return;
+        }
+
+        if (isServer)
+        {
+            MyGm.StartRound();
+            DealButton.enabled = false;
+        }
+        else
+        {
+            CmdDealCards();
+        }
+    }
+
+    [Command]
+    void CmdDealCards()
+    {
+        DealCards();
+    }
+
+    void ActivateDealButton()
+    {
+        DealButton.enabled = true;
+    }
+
+    [ClientRpc]
+    public void RpcActivateDealButton()
+    {
+        if (!isLocalPlayer)
+        {
+            return;
+        }
+
+       ActivateDealButton();
     }
 
     IEnumerator Wait()
