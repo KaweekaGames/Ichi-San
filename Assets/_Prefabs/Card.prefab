@@ -169,7 +169,6 @@ MonoBehaviour:
   moveEase: 2
   snapEase: 2
   discardEase: 2
-  scaleFactor: {x: 1, y: 1, z: 1}
   onDiscardPile: 0
   touched: 0
   spadeSprites:
@@ -187,6 +186,7 @@ MonoBehaviour:
   - {fileID: 21300020, guid: e923c6082eef89646b87f3cce6960c60, type: 3}
   - {fileID: 21300022, guid: e923c6082eef89646b87f3cce6960c60, type: 3}
   - {fileID: 21300024, guid: e923c6082eef89646b87f3cce6960c60, type: 3}
+  - {fileID: 21300000, guid: 3e79f50ea68d9b341b6406de305c0899, type: 3}
   clubSprites:
   - {fileID: 21300118, guid: e923c6082eef89646b87f3cce6960c60, type: 3}
   - {fileID: 21300078, guid: e923c6082eef89646b87f3cce6960c60, type: 3}
@@ -202,6 +202,7 @@ MonoBehaviour:
   - {fileID: 21300098, guid: e923c6082eef89646b87f3cce6960c60, type: 3}
   - {fileID: 21300100, guid: e923c6082eef89646b87f3cce6960c60, type: 3}
   - {fileID: 21300102, guid: e923c6082eef89646b87f3cce6960c60, type: 3}
+  - {fileID: 21300000, guid: 7d14ed0f9433b074aa61b23cf9bbab25, type: 3}
   diamondSprites:
   - {fileID: 21300118, guid: e923c6082eef89646b87f3cce6960c60, type: 3}
   - {fileID: 21300026, guid: e923c6082eef89646b87f3cce6960c60, type: 3}
@@ -217,6 +218,7 @@ MonoBehaviour:
   - {fileID: 21300046, guid: e923c6082eef89646b87f3cce6960c60, type: 3}
   - {fileID: 21300048, guid: e923c6082eef89646b87f3cce6960c60, type: 3}
   - {fileID: 21300050, guid: e923c6082eef89646b87f3cce6960c60, type: 3}
+  - {fileID: 21300000, guid: a9ed9a3d2e688bb418409ddc9c5e5ce5, type: 3}
   heartSprites:
   - {fileID: 21300118, guid: e923c6082eef89646b87f3cce6960c60, type: 3}
   - {fileID: 21300052, guid: e923c6082eef89646b87f3cce6960c60, type: 3}
@@ -232,6 +234,7 @@ MonoBehaviour:
   - {fileID: 21300072, guid: e923c6082eef89646b87f3cce6960c60, type: 3}
   - {fileID: 21300074, guid: e923c6082eef89646b87f3cce6960c60, type: 3}
   - {fileID: 21300076, guid: e923c6082eef89646b87f3cce6960c60, type: 3}
+  - {fileID: 21300000, guid: c2efe3fa4c4eef64a9fb09dc5d9bd947, type: 3}
 --- !u!114 &114316492572207898
 MonoBehaviour:
   m_ObjectHideFlags: 1

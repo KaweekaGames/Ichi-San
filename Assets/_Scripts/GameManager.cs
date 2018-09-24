@@ -307,7 +307,10 @@ public class GameManager : NetworkBehaviour
     // Function replinishes draw pile if it runs out
     private void RefreshDrawPile()
     {
-        discardPile.Remove(DiscardPileCardValue);
+        if (SuitOverride == 0)
+        {
+            discardPile.Remove(DiscardPileCardValue); 
+        }
 
         drawPile = ShuffleDeck(discardPile);
 
@@ -315,7 +318,10 @@ public class GameManager : NetworkBehaviour
 
         discardPile.Clear();
 
-        discardPile.Add(DiscardPileCardValue);
+        if (SuitOverride == 0)
+        {
+            discardPile.Add(DiscardPileCardValue); 
+        }
     }
 
     // Function deals cards to players to start round
@@ -646,6 +652,7 @@ public class GameManager : NetworkBehaviour
     public void SetSuit(int suit)
     {
         SuitOverride = suit;
+        DiscardPileCardValue = (suit * 100 + 14);
         GameState = 0;
         ChangePlayerTurn();
     }
@@ -780,6 +787,8 @@ public class GameManager : NetworkBehaviour
         Draw2 = false;
 
         Clockwise = -1;
+
+        SuitOverride = 0;
 
         if (playerStart < PlayerCount - 1)
         { 

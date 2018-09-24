@@ -27,6 +27,7 @@ public class TurnIndicator : MonoBehaviour
     float countDownTimer;
     int currentTurn = 0;
     int zRotation = -1;
+    bool goSpin = false;
 
     SpriteRenderer mySpriteRenderer;
 
@@ -39,7 +40,16 @@ public class TurnIndicator : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Spin();
+        if (MyGM.ExpectedPlayerCount == MyGM.PlayerCount)
+        {
+            goSpin = true;
+            ChangeColor(MyGM.PlayerTurn);
+        }
+
+        if (goSpin)
+        {
+            Spin();
+        }
     }
 
     public void Spin()
