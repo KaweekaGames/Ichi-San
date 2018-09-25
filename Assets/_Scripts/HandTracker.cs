@@ -7,24 +7,27 @@ using TMPro;
 
 public class HandTracker : NetworkBehaviour
 {
+    // UI Elements for player names and # cards left
     public GameObject[] PlayerPanel;
     public TextMeshProUGUI[] PlayerName;
     public TextMeshProUGUI[] PlayerCards;
-
-    public GameObject ScoreBoardPanel;
-    public TextMeshProUGUI[] PlayerScoreBoardNames;
-    public TextMeshProUGUI[] PlayerScores;
-
-    GameObject playerHandArea;
-    SpriteRenderer pHASpriteRenderer;
-
-    public Player MyPlayer;
-
     Image panelImage0;
     Image panelImage1;
     Image panelImage2;
     Image panelImage3;
 
+    // UI Elements for the scoreboard
+    public GameObject ScoreBoardPanel;
+    public TextMeshProUGUI[] PlayerScoreBoardNames;
+    public TextMeshProUGUI[] PlayerScores;
+
+    // Player hand area background
+    GameObject playerHandArea;
+    SpriteRenderer pHASpriteRenderer;
+
+    public Player MyPlayer;
+
+    // Color pallette for player panels
     [SerializeField]
     Color[] PlayerColors;
 
@@ -61,6 +64,7 @@ public class HandTracker : NetworkBehaviour
             return;
         }
 
+        // After GM has found all players, start hand tracker functions
         if (!initialized && MyPlayer.GMReady == 1)
         {
             numberOfPlayers = MyPlayer.ReturnNumberofPlayers();
@@ -75,6 +79,7 @@ public class HandTracker : NetworkBehaviour
             initialized = true;
         }
 
+        // Find reference to all players
         if (initialized && players.Count < numberOfPlayers)
         {
             GameObject[] gameObjects = GameObject.FindGameObjectsWithTag("Player");
@@ -92,6 +97,7 @@ public class HandTracker : NetworkBehaviour
             }
         }
 
+        // Once all players have been found, sort them by player number
         if (initialized && !sorted)
         {
             if (players.Count != numberOfPlayers)
@@ -106,6 +112,7 @@ public class HandTracker : NetworkBehaviour
             SetPlayerTagText();
         }
 
+        // Keep hand counts updated
         if (sorted && MyPlayer.MyHand.Count > 0)
         {
             UpdateHandCounts();

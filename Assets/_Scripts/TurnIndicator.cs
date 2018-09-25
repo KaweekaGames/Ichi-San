@@ -5,15 +5,9 @@ using UnityEngine;
 
 public class TurnIndicator : MonoBehaviour
 {
-    public Sprite[] IndicatorSprites2;
-    public Sprite[] IndicatorSprites3;
-    public Sprite[] IndicatorSprites4;
-
     public Color[] TurnColors;
 
     public GameManager MyGM;
-
-    int numberOfPlayers = 2;
 
     [SerializeField]
     float rotationSpeed;
@@ -22,12 +16,11 @@ public class TurnIndicator : MonoBehaviour
     [SerializeField]
     EaseType rotationEase;
     [SerializeField]
-    float timer;
+    float colorTransitionTimer = .5f;
 
     float countDownTimer;
     int currentTurn = 0;
     int zRotation = -1;
-    bool goSpin = false;
 
     SpriteRenderer mySpriteRenderer;
 
@@ -35,27 +28,20 @@ public class TurnIndicator : MonoBehaviour
     void Start()
     {
         mySpriteRenderer = gameObject.GetComponent<SpriteRenderer>();
+
+        ChangeColor(currentTurn);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (!goSpin && MyGM.ExpectedPlayerCount == MyGM.PlayerCount)
-        {
-            goSpin = true;
-            ChangeColor(MyGM.PlayerTurn);
-        }
-
-        if (goSpin)
-        {
-            Spin();
-        }
+        Spin();
     }
 
+    // Spins turn indicator after confirming if it is the right color
     public void Spin()
     {
         zRotation = MyGM.Clockwise;
-        numberOfPlayers = MyGM.PlayerCount;
 
         if (currentTurn != MyGM.PlayerTurn)
         {
@@ -67,9 +53,10 @@ public class TurnIndicator : MonoBehaviour
         gameObject.RotateBy(spinDirection, rotationSpeed, rotationDelay, rotationEase);
     }
 
+    // Matches color of turn indicator to color of current player turn
     public void ChangeColor(int playerNum)
     {
-        gameObject.ColorTo(TurnColors[playerNum], .5f, 0);
+        gameObject.ColorTo(TurnColors[playerNum], colorTransitionTimer, 0);
     }
 
 
