@@ -595,6 +595,8 @@ public class Player : NetworkBehaviour
 
     public void DealCards()
     {
+        Debug.Log("dealing button");
+
         if (!isLocalPlayer)
         {
             return;
