@@ -43,7 +43,7 @@ public class HandTracker : NetworkBehaviour
 
         players = new List<Player>();
 
-        ScoreBoardPanel.SetActive(false);
+        ScoreBoardPanel.SetActive(true);
 
         // Get Panel Sprites/Image reference for color change
         panelImage0 = PlayerPanel[0].GetComponent<Image>();
@@ -92,11 +92,18 @@ public class HandTracker : NetworkBehaviour
             }
         }
 
-        if (initialized && players.Count == numberOfPlayers && !sorted)
+        if (initialized && !sorted)
         {
+            if (players.Count != numberOfPlayers)
+            {
+                return;
+            }
+
             SortPlayers();
 
             sorted = true;
+
+            SetPlayerTagText();
         }
 
         if (sorted && MyPlayer.MyHand.Count > 0)
@@ -109,7 +116,7 @@ public class HandTracker : NetworkBehaviour
     {
         tempList = new List<Player>();
 
-        for (int i = 0; i < players.Count - 1; i++)
+        for (int i = 0; i < players.Count; i++)
         {
             foreach (Player plyr in players)
             {
@@ -268,6 +275,117 @@ public class HandTracker : NetworkBehaviour
                 PlayerName[2].text = players[2].MyName;
                 int handCount2 = players[3].ReturnNumberofCards(2);
                 PlayerCards[2].text = handCount2.ToString();
+                PlayerCards[2].color = PlayerColors[2];
+                panelImage2.color = PlayerColors[2];
+            }
+        }
+    }
+
+    void SetPlayerTagText()
+    {
+        if (numberOfPlayers == 2)
+        {
+            if (MyPlayer.MyInt == 0)
+            {
+                PlayerName[0].text = players[1].MyName;
+                PlayerCards[0].color = PlayerColors[1];
+                panelImage0.color = PlayerColors[1];
+            }
+            else
+            {
+                PlayerName[0].text = players[0].MyName;
+                PlayerCards[0].color = PlayerColors[0];
+                panelImage0.color = PlayerColors[0];
+            }
+        }
+        else if (numberOfPlayers == 3)
+        {
+            if (MyPlayer.MyInt == 0)
+            {
+                PlayerName[1].text = players[1].MyName;
+                PlayerCards[1].color = PlayerColors[1];
+                panelImage1.color = PlayerColors[1];
+
+                PlayerName[2].text = players[2].MyName;
+                PlayerCards[2].color = PlayerColors[2];
+                panelImage2.color = PlayerColors[2];
+            }
+            else if (MyPlayer.MyInt == 1)
+            {
+                PlayerName[1].text = players[2].MyName;
+                PlayerCards[1].color = PlayerColors[2];
+                panelImage1.color = PlayerColors[2];
+
+                PlayerName[2].text = players[0].MyName;
+                PlayerCards[2].color = PlayerColors[0];
+                panelImage2.color = PlayerColors[0];
+            }
+            else if (MyPlayer.MyInt == 2)
+            {
+                PlayerName[1].text = players[0].MyName;
+                PlayerCards[1].color = PlayerColors[0];
+                panelImage1.color = PlayerColors[0];
+
+                PlayerName[2].text = players[1].MyName;
+                PlayerCards[2].color = PlayerColors[1];
+                panelImage2.color = PlayerColors[1];
+            }
+        }
+        else if (numberOfPlayers == 4)
+        {
+            if (MyPlayer.MyInt == 0)
+            {
+                PlayerName[0].text = players[2].MyName;
+                PlayerCards[0].color = PlayerColors[2];
+                panelImage0.color = PlayerColors[2];
+
+                PlayerName[1].text = players[1].MyName;
+                PlayerCards[1].color = PlayerColors[1];
+                panelImage1.color = PlayerColors[1];
+
+                PlayerName[2].text = players[3].MyName;
+                PlayerCards[2].color = PlayerColors[3];
+                panelImage2.color = PlayerColors[3];
+            }
+            else if (MyPlayer.MyInt == 1)
+            {
+                PlayerName[0].text = players[3].MyName;
+                PlayerCards[0].color = PlayerColors[3];
+                panelImage0.color = PlayerColors[3];
+
+                PlayerName[1].text = players[2].MyName;
+                PlayerCards[1].color = PlayerColors[2];
+                panelImage1.color = PlayerColors[2];
+
+                PlayerName[2].text = players[0].MyName;
+                PlayerCards[2].color = PlayerColors[0];
+                panelImage2.color = PlayerColors[0];
+            }
+            else if (MyPlayer.MyInt == 2)
+            {
+                PlayerName[0].text = players[0].MyName;
+                PlayerCards[0].color = PlayerColors[0];
+                panelImage0.color = PlayerColors[0];
+
+                PlayerName[1].text = players[3].MyName;
+                PlayerCards[1].color = PlayerColors[3];
+                panelImage1.color = PlayerColors[3];
+
+                PlayerName[2].text = players[1].MyName;
+                PlayerCards[2].color = PlayerColors[1];
+                panelImage2.color = PlayerColors[1];
+            }
+            else if (MyPlayer.MyInt == 3)
+            {
+                PlayerName[0].text = players[1].MyName;
+                PlayerCards[0].color = PlayerColors[1];
+                panelImage0.color = PlayerColors[1];
+
+                PlayerName[1].text = players[0].MyName;
+                PlayerCards[1].color = PlayerColors[0];
+                panelImage1.color = PlayerColors[0];
+
+                PlayerName[2].text = players[2].MyName;
                 PlayerCards[2].color = PlayerColors[2];
                 panelImage2.color = PlayerColors[2];
             }

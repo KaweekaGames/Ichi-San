@@ -515,23 +515,31 @@ public class Player : NetworkBehaviour
 
     public int ReturnNumberofCards(int playerNum)
     {
+        int numCards = 0;
+
         switch (playerNum)
         {
             case 0:
-                return MyGm.Player0CardsLeft;
+                numCards = MyGm.Player0CardsLeft;
+                break;
 
             case 1:
-                return MyGm.Player1CardsLeft;
+                numCards = MyGm.Player1CardsLeft;
+                break;
 
             case 2:
-                return MyGm.Player2CardsLeft;
+                numCards = MyGm.Player2CardsLeft;
+                break;
 
             case 3:
-                return MyGm.Player3CardsLeft;
+                numCards = MyGm.Player3CardsLeft;
+                break;
 
             default:
                 return 999999;
         }
+
+        return numCards;
     }
 
     [ClientRpc]
@@ -595,8 +603,6 @@ public class Player : NetworkBehaviour
 
     public void DealCards()
     {
-        Debug.Log("dealing button");
-
         if (!isLocalPlayer)
         {
             return;
