@@ -73,7 +73,7 @@ public class Player : NetworkBehaviour
     public Button[] SuitButtons;
 
     // UI button for dealing cards
-    public Button DealButton;
+    public GameObject DealPlane;
 
     // Reference to ScoreBoard
     public HandTracker HandTracker;
@@ -94,7 +94,7 @@ public class Player : NetworkBehaviour
     {
         GetMyName(MyName);
 
-        DealButton.interactable = false;
+        DealPlane.SetActive(false);
     }
 
     // Update is called once per frame
@@ -623,12 +623,12 @@ public class Player : NetworkBehaviour
 
     void ActivateDealButton()
     {
-        DealButton.interactable = true;
+        DealPlane.SetActive(true);
     }
 
     void DeactivateDealButton()
     {
-        DealButton.interactable = false;
+        DealPlane.SetActive(false);
     }
 
     [ClientRpc]
