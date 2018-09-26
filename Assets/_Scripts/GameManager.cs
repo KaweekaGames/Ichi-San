@@ -75,6 +75,7 @@ public class GameManager : NetworkBehaviour
 
     bool handDealt = false;
     bool firstCard = true;
+    bool roundOver = false;
 
     int playerStart = 0;
     float startTimer;
@@ -443,7 +444,10 @@ public class GameManager : NetworkBehaviour
 
             RemoveCard(PlayerTurn, cardValue);
 
-            ChangePlayerTurn();
+            if (!roundOver)
+            {
+                ChangePlayerTurn(); 
+            }
         }
         else
         {
@@ -721,6 +725,8 @@ public class GameManager : NetworkBehaviour
 
     void RoundOver()
     {
+        roundOver = true;
+
         int multiplyer;
 
         if (GameState == 11) // If last card is a jack add 2X multipier to scores
@@ -810,6 +816,8 @@ public class GameManager : NetworkBehaviour
         Clockwise = -1;
 
         SuitOverride = 0;
+
+        roundOver = false;
 
         foreach (List<int> playerHand in playerHands)
         {
