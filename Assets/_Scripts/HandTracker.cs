@@ -413,9 +413,9 @@ public class HandTracker : NetworkBehaviour
             case 3:
                 PlayerPanel[1].SetActive(true);
                 PlayerPanel[2].SetActive(true);
-                PlayerScoreBoardNames[0].enabled = true;
-                PlayerScoreBoardNames[1].enabled = true;
-                PlayerScoreBoardNames[2].enabled = true;
+                PlayerScoreBoardNames[0].gameObject.SetActive(true);
+                PlayerScoreBoardNames[1].gameObject.SetActive(true);
+                PlayerScoreBoardNames[2].gameObject.SetActive(true);
                 PlayerScores[0].enabled = true;
                 PlayerScores[1].enabled = true;
                 PlayerScores[2].enabled = true;
@@ -424,10 +424,10 @@ public class HandTracker : NetworkBehaviour
                 PlayerPanel[0].SetActive(true);
                 PlayerPanel[1].SetActive(true);
                 PlayerPanel[2].SetActive(true);
-                PlayerScoreBoardNames[0].enabled = true;
-                PlayerScoreBoardNames[1].enabled = true;
-                PlayerScoreBoardNames[2].enabled = true;
-                PlayerScoreBoardNames[3].enabled = true;
+                PlayerScoreBoardNames[0].gameObject.SetActive(true);
+                PlayerScoreBoardNames[1].gameObject.SetActive(true);
+                PlayerScoreBoardNames[2].gameObject.SetActive(true);
+                PlayerScoreBoardNames[3].gameObject.SetActive(true);
                 PlayerScores[0].enabled = true;
                 PlayerScores[1].enabled = true;
                 PlayerScores[2].enabled = true;
