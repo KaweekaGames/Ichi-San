@@ -787,18 +787,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 576d36c53280cc849aca4c592e6f320e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IndicatorSprites2:
-  - {fileID: 21300000, guid: 23366c590fa82f04ba7c7bdbd954dbf8, type: 3}
-  - {fileID: 21300000, guid: 0b399685b4c6b654da767fd344b4c2a9, type: 3}
-  IndicatorSprites3:
-  - {fileID: 21300000, guid: 23366c590fa82f04ba7c7bdbd954dbf8, type: 3}
-  - {fileID: 21300000, guid: 86acceb323ab86349822f5e14acef320, type: 3}
-  - {fileID: 21300000, guid: 7228e7726bfd46144ac728cb6b88153f, type: 3}
-  IndicatorSprites4:
-  - {fileID: 21300000, guid: 23366c590fa82f04ba7c7bdbd954dbf8, type: 3}
-  - {fileID: 21300000, guid: 86acceb323ab86349822f5e14acef320, type: 3}
-  - {fileID: 21300000, guid: 0b399685b4c6b654da767fd344b4c2a9, type: 3}
-  - {fileID: 21300000, guid: 7228e7726bfd46144ac728cb6b88153f, type: 3}
   TurnColors:
   - {r: 0.20392159, g: 0.6, b: 0.86274517, a: 1}
   - {r: 0.9450981, g: 0.3529412, b: 0.30980393, a: 1}
@@ -808,7 +796,7 @@ MonoBehaviour:
   rotationSpeed: 3.2
   rotationDelay: 0
   rotationEase: 27
-  timer: 3
+  colorTransitionTimer: 0.5
 --- !u!1 &1095698277
 GameObject:
   m_ObjectHideFlags: 0

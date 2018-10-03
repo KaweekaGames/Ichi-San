@@ -405,10 +405,10 @@ public class HandTracker : NetworkBehaviour
         {
             case 2:
                 PlayerPanel[0].SetActive(true);
-                PlayerScoreBoardNames[0].enabled = true;
-                PlayerScoreBoardNames[1].enabled = true;
-                PlayerScores[0].enabled = true;
-                PlayerScores[1].enabled = true;
+                PlayerScoreBoardNames[0].gameObject.SetActive(true);
+                PlayerScoreBoardNames[1].gameObject.SetActive(true);
+                PlayerScores[0].gameObject.SetActive(true);
+                PlayerScores[1].gameObject.SetActive(true);
                 break;
             case 3:
                 PlayerPanel[1].SetActive(true);

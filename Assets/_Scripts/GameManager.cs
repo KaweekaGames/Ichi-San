@@ -405,7 +405,10 @@ public class GameManager : NetworkBehaviour
 
             RemoveCard(PlayerTurn, cardValue);
 
-            playerList[PlayerTurn].TakeAction(GameState);
+            if (!roundOver)
+            {
+                playerList[PlayerTurn].TakeAction(GameState); 
+            }
 
             return;
         }
